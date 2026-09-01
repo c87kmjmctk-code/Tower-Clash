@@ -1,0 +1,1827 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Tower Clash 3.2.1 — White Screen Fix</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}button{touch-action:manipulation;-webkit-user-select:none;user-select:none;cursor:pointer;pointer-events:auto}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080d14;color:#fff;font-family:Arial,sans-serif}
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+#app{height:100%;display:flex;flex-direction:column}
+#top{height:72px;display:grid;grid-template-columns:1fr 150px 1fr;align-items:center;gap:12px;padding:8px 15px;background:linear-gradient(#121b29,#0d141f);border-bottom:1px solid #334158}
+.side.enemy{text-align:right}.name{font-weight:900;font-size:14px}.bar{height:14px;background:#273244;border-radius:10px;overflow:hidden;margin-top:7px;border:1px solid #3c4b61}.fill{height:100%;width:100%;background:linear-gradient(90deg,#45df7c,#b8ff6d)}.enemy .fill{margin-left:auto;background:linear-gradient(90deg,#ffb33e,#ff4f4f)}
+#clock{text-align:center;font-size:24px;font-weight:1000}#phase{text-align:center;color:#aebdce;font-size:10px;font-weight:bold;margin-top:3px}
+#stage{position:relative;flex:1;min-height:0}canvas{display:block;width:100%;height:100%;touch-action:none}
+#tip{position:absolute;z-index:5;left:50%;top:9px;transform:translateX(-50%);background:#0d1622dd;border:1px solid #40516a;border-radius:12px;padding:7px 12px;font-size:11px;color:#dbe8f5;pointer-events:none}
+#msg{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:1000;text-shadow:0 5px 30px #000;pointer-events:none}
+#bottom{background:linear-gradient(#101824,#172131);border-top:1px solid #34445a;padding:8px 11px 11px}
+#energy{display:flex;gap:10px;align-items:center;margin-bottom:8px;font-weight:900}#energyTxt{width:105px}.etrack{height:16px;flex:1;border-radius:10px;background:#263143;overflow:hidden;border:1px solid #3a4960}.efill{height:100%;width:50%;background:linear-gradient(90deg,#3edcff,#765cff)}
+#buttons{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none}#buttons::-webkit-scrollbar{display:none}.unitBtn{position:relative;z-index:3;pointer-events:auto;flex:0 0 158px;min-height:62px;white-space:normal;line-height:1.12;overflow:hidden;border-radius:13px;border:1px solid #46566e;background:linear-gradient(#263348,#1c2635);color:#fff;font-size:11px;font-weight:900}.unitBtn.sel{outline:2px solid #ffd450;background:linear-gradient(#423b31,#292a31)}.unitBtn:disabled{opacity:.4}.unitBtn b{display:block;font-size:20px}.unitBtn small{white-space:nowrap}.unitBtn small{display:block;color:#75e0ff;margin-top:3px}
+#powers{position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:7px}.powerBtn{border:1px solid #53627a;border-radius:12px;background:#222c3b;color:white;padding:7px;font-weight:900;font-size:11px}.powerBtn:disabled{opacity:.4}#civPick{position:relative;z-index:14;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:18px 0;width:100%}
+.civ{position:relative;z-index:15;pointer-events:auto;min-width:0;border:2px solid #43536b;border-radius:18px;padding:12px 6px;background:#192536;color:white;font-weight:900;font-size:clamp(10px,1.25vw,15px);overflow:hidden}
+.civ span{display:block;font-size:30px;margin-bottom:5px}.civ.selected{border-color:#ffd75a;box-shadow:0 0 24px #ffd75a33}
+.civ.volc.selected{border-color:#ff7045;box-shadow:0 0 24px #ff704544}
+.civ.glacial.selected{border-color:#71dcff;box-shadow:0 0 24px #71dcff55}
+.civ.necro.selected{border-color:#b77aff;box-shadow:0 0 24px #b77aff55}
+.civ.tempest.selected{border-color:#ffe56a;box-shadow:0 0 24px #ffe56a55}
+@media(max-width:760px){#civPick{grid-template-columns:repeat(2,minmax(0,1fr));max-height:330px;overflow:auto}.card{width:min(560px,94vw)}}
+@media(min-width:761px) and (max-width:1200px){.card{width:min(860px,94vw)}#civPick{gap:8px}.civ{padding:10px 4px}}
+#start{position:absolute;inset:0;z-index:12;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#233652ee,#080d15fa 72%)}.card{position:relative;z-index:13;width:min(920px,94vw);text-align:center;padding:27px;border-radius:24px;border:1px solid #465874;background:#111b29f4;box-shadow:0 25px 90px #000}.logo{font-size:clamp(27px,3.2vw,40px);font-weight:1000}.sub{color:#aebfd1;margin:8px 0 20px}.play{border:0;border-radius:15px;padding:14px 24px;font-size:16px;font-weight:1000;background:linear-gradient(#ffe36b,#ffad35);color:#1b1308}
+#again{display:none;position:absolute;z-index:15;left:50%;top:62%;transform:translate(-50%,-50%)}
+@media(max-width:760px){#top{height:63px;grid-template-columns:1fr 105px 1fr;padding:6px 8px}.name{font-size:11px}#clock{font-size:19px}#bottom{padding:6px 8px 8px}.unitBtn{min-height:52px;font-size:9px}.unitBtn b{font-size:16px}}
+
+/* 1.0 polish */
+#top{backdrop-filter:blur(8px);background:linear-gradient(180deg,#0b111de8,#111b28dd);border-bottom:1px solid #ffffff12}
+.side .name{text-shadow:0 1px 8px #000}
+#clock{font-size:24px;text-shadow:0 0 16px #73dfff44}
+#phase{letter-spacing:1.4px}
+#buttons{background:linear-gradient(180deg,#101a27ee,#09111cee);border-top:1px solid #ffffff12}
+.unitBtn{transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}
+.unitBtn:active{transform:scale(.96)}
+.unitBtn.sel{box-shadow:0 0 16px #68e7ff35}
+.power{transition:transform .12s ease,filter .12s ease}
+.power:active{transform:scale(.97)}
+#battleBanner{position:absolute;z-index:7;left:50%;top:20%;transform:translate(-50%,-50%) scale(.85);font-weight:1000;font-size:clamp(28px,5vw,58px);letter-spacing:3px;color:#fff;text-shadow:0 4px 25px #000,0 0 24px #6ee7ff;opacity:0;pointer-events:none;transition:.25s}
+#battleBanner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#result{position:absolute;z-index:30;inset:0;background:#050912d9;display:none;align-items:center;justify-content:center;backdrop-filter:blur(9px)}
+#result.show{display:flex}
+.resultCard{width:min(520px,90vw);padding:30px;border:1px solid #ffffff25;border-radius:25px;background:linear-gradient(145deg,#182638,#0b121e);box-shadow:0 25px 90px #000;text-align:center}
+#resultIcon{font-size:72px}
+#resultTitle{font-size:42px;font-weight:1000;margin:4px 0}
+#resultStats{color:#9fb3c7;line-height:1.7;margin:12px 0 20px}
+.resultBtn{width:100%;border:0;border-radius:14px;padding:15px;font-weight:1000;font-size:17px;background:#68e7ff;color:#06111a}
+
+.civ[data-civ="verdantia"]{background:linear-gradient(145deg,#203a27,#14281a)}
+.civ[data-civ="umbral"]{background:linear-gradient(145deg,#2d2240,#15101f)}
+.civ[data-civ="solaria"]{background:linear-gradient(145deg,#4b3a1e,#241b0d)}
+.civ[data-civ="aqualis"]{background:linear-gradient(145deg,#183a4d,#0e2430)}
+.civ[data-civ="dunara"]{background:linear-gradient(145deg,#4a3821,#271c10)}
+.civ[data-civ="verdantia"] span{filter:drop-shadow(0 0 8px #78ef8c)}
+.civ[data-civ="umbral"] span{filter:drop-shadow(0 0 8px #9b67ff)}
+.civ[data-civ="solaria"] span{filter:drop-shadow(0 0 8px #ffe56b)}
+.civ[data-civ="aqualis"] span{filter:drop-shadow(0 0 8px #64dfff)}
+.civ[data-civ="dunara"] span{filter:drop-shadow(0 0 8px #e8c47a)}
+
+/* 1.3.1 maps + admin + ranked fixes */
+/* 1.5.1 modular towers + debris blockers + troop deployment runtime fix */
+.sys{transition:.18s}.sys.warn{color:#ffd36b;border-color:#ffd36b66}.sys.down{background:#2b1111}.towerLegend{font-size:9px;color:#9fb3c7;text-align:center;margin-top:4px}
+.towerSystems{display:flex;gap:5px;margin-top:4px;justify-content:flex-start;flex-wrap:wrap}.enemy .towerSystems{justify-content:flex-end}.sys{font-size:8px;padding:2px 5px;border-radius:6px;background:#101824;border:1px solid #ffffff22;color:#b8c7d8}.sys.down{color:#ff806b;border-color:#ff5c4555;text-decoration:line-through}.sys.core{color:#ff9d9d}.setupRow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0}.setupRow select,.setupRow button{min-height:40px;border-radius:10px;border:1px solid #ffffff2a;background:#16253a;color:white;padding:8px 12px;font-weight:800}.adminPanel{position:absolute;z-index:95;right:8px;top:8px;width:min(290px,82vw);padding:10px;border:1px solid #ffffff2d;border-radius:12px;background:#07101bea;color:white;display:none}.adminPanel.show{display:block}.adminPanel h3{margin:0 0 8px;font-size:13px}.adminGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.adminGrid button{min-height:36px;border:1px solid #ffffff25;border-radius:8px;background:#1a2a40;color:white;font-weight:800}.mapBadge{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:8;background:#07101bcc;border:1px solid #ffffff25;border-radius:999px;padding:4px 10px;font-size:9px;color:#dcecff;pointer-events:none}.adminStatus{margin-top:8px;padding:6px 8px;border-radius:8px;background:#0e1d2d;color:#8fe7ff;font-size:10px;min-height:26px}.rankInfo{font-size:10px;color:#ffd86b;font-weight:900;margin-top:5px}.setupRow .rankedActive{border-color:#ffd75a;box-shadow:0 0 0 2px #ffd75a33}
+
+/* 1.8.6 — viewport / HP visibility fix */
+#app{height:100dvh;min-height:100dvh}
+#top{flex:0 0 auto;min-height:92px;height:auto;grid-template-columns:minmax(0,1fr) 130px minmax(0,1fr);padding:8px 12px;align-items:start}
+#top .side{min-width:0}
+#top .name{font-size:12px;white-space:normal;line-height:1.15;min-height:28px}
+#top .bar{height:15px;margin-top:4px}
+.towerSystems{margin-top:3px;gap:3px;flex-wrap:nowrap}
+.sys{font-size:8px;padding:2px 3px;white-space:nowrap}
+#stage{flex:1 1 auto;min-height:180px}
+#bottom{flex:0 0 auto;max-height:32dvh;overflow:hidden}
+@media(max-width:760px){
+ #top{min-height:104px;height:auto;grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:5px;padding:7px 6px}
+ #top .name{font-size:9px;min-height:23px}
+ #clock{font-size:17px}
+ #phase,#mechanic,#combatHint{font-size:7px!important}
+ .towerSystems{display:grid;grid-template-columns:1fr;gap:1px}
+ .enemy .towerSystems{justify-items:end}
+ .sys{font-size:7px;padding:1px 3px}
+ #stage{min-height:190px}
+ #bottom{max-height:30dvh;padding:5px 6px 7px}
+ .unitBtn{min-height:48px}
+}
+@media(max-height:650px) and (orientation:landscape){
+ #top{min-height:78px;grid-template-columns:minmax(0,1fr) 95px minmax(0,1fr);padding:4px 8px}
+ #top .name{font-size:9px;min-height:18px}
+ .towerSystems{display:flex;flex-wrap:nowrap}
+ .sys{font-size:7px;padding:1px 2px}
+ #clock{font-size:16px}
+ #mechanic,#combatHint{display:none}
+ #bottom{max-height:34dvh;padding:4px 7px}
+ #energy{margin-bottom:3px}
+ .unitBtn{min-height:42px}
+}
+
+/* 1.8.7 — iPad landscape battlefield expansion */
+@media (orientation:landscape) and (min-width:900px){
+  html,body{height:100%;min-height:100%;overflow:hidden}
+  #app{height:100dvh;min-height:0}
+  #top{
+    flex:0 0 68px!important;
+    min-height:68px!important;
+    height:68px!important;
+    grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr)!important;
+    padding:5px 18px!important;
+    align-items:center!important;
+  }
+  #top .name{font-size:12px!important;min-height:0!important;white-space:nowrap!important}
+  #top .bar{height:12px!important;margin-top:3px!important}
+  .towerSystems{display:flex!important;flex-wrap:nowrap!important;margin-top:2px!important;gap:4px!important}
+  .sys{font-size:7px!important;padding:1px 4px!important}
+  #clock{font-size:21px!important}
+  #phase{font-size:8px!important;margin-top:0!important}
+  #mechanic{font-size:7px!important;margin-top:0!important}
+  #combatHint{display:none!important}
+
+  #stage{
+    flex:1 1 0!important;
+    min-height:0!important;
+    height:auto!important;
+  }
+  canvas{width:100%!important;height:100%!important}
+
+  #bottom{
+    flex:0 0 154px!important;
+    height:154px!important;
+    max-height:154px!important;
+    min-height:154px!important;
+    padding:5px 10px 6px!important;
+    overflow:hidden!important;
+  }
+  #energy{height:23px!important;margin-bottom:4px!important}
+  #energyTxt{font-size:12px!important;width:105px!important}
+  .etrack{height:12px!important}
+  #buttons{height:67px!important;gap:5px!important;padding-bottom:2px!important}
+  .unitBtn{flex-basis:145px!important;min-height:62px!important;height:62px!important;font-size:9px!important}
+  .unitBtn b{font-size:14px!important}
+  #powers{height:42px!important;gap:6px!important;margin-top:3px!important}
+  .powerBtn{min-height:36px!important;height:36px!important;padding:4px 8px!important;font-size:10px!important}
+  #tip{top:6px!important;padding:5px 10px!important;font-size:9px!important}
+}
+
+/* Tower Clash 2.x responsive refinements (updates 2.0.8–2.0.9) */
+@media (orientation:landscape) and (min-width:900px){
+  #stage{min-height:220px}
+  #top{overflow:visible}
+}
+
+/* 3.0.0 — Player Profiles */
+#profileBtn{position:absolute;right:14px;top:12px;z-index:20;border:1px solid #ffffff33;background:#162336;color:#fff;border-radius:12px;padding:8px 12px;font-weight:900;font-size:12px}
+#profilePanel{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:#050a11eF;padding:18px}
+#profilePanel.show{display:flex}
+.profileCard{width:min(760px,94vw);max-height:90vh;overflow:auto;background:linear-gradient(#152236,#0c1420);border:1px solid #ffffff2e;border-radius:20px;padding:18px;box-shadow:0 20px 80px #000a}
+.profileHead{display:grid;grid-template-columns:90px 1fr auto;gap:14px;align-items:center}
+#profileAvatar{width:82px;height:82px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:46px;background:#0d1724;border:1px solid #ffffff2c}
+#profileName{font-size:26px;font-weight:1000}
+#profileRank{font-size:13px;color:#ffd76b;margin-top:4px}
+.profileGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.profileStat{background:#0c1724;border:1px solid #ffffff18;border-radius:12px;padding:10px;text-align:center}
+.profileStat b{display:block;font-size:18px}
+.profileStat small{color:#91a6ba}
+.profileSection{margin-top:16px;background:#0a1420;border:1px solid #ffffff16;border-radius:14px;padding:12px}
+.profileSection h3{margin:0 0 8px;font-size:14px}
+.profileXp{height:12px;background:#243044;border-radius:8px;overflow:hidden;margin-top:5px}
+.profileXp>div{height:100%;background:linear-gradient(90deg,#43dbff,#7b67ff)}
+.profileControls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.profileControls input,.profileControls select{width:100%;padding:10px;border-radius:10px;border:1px solid #ffffff2a;background:#0c1623;color:#fff}
+.profileActions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.profileActions button{padding:10px 14px;border-radius:10px;border:1px solid #ffffff2c;background:#1b2b40;color:#fff;font-weight:900}
+.badgeWrap{display:flex;gap:6px;flex-wrap:wrap}
+.badgeChip{font-size:11px;padding:5px 8px;border-radius:999px;background:#172538;border:1px solid #ffffff20}
+.historyRow{display:grid;grid-template-columns:70px 1fr auto;gap:8px;padding:7px 0;border-bottom:1px solid #ffffff10;font-size:11px}
+@media(max-width:760px){.profileGrid{grid-template-columns:repeat(2,1fr)}.profileHead{grid-template-columns:68px 1fr}.profileHead>div:last-child{grid-column:1/-1}.profileControls{grid-template-columns:1fr}}
+
+/* 3.1.0 — Real Lobby */
+#lobby{position:absolute;inset:0;z-index:35;background:radial-gradient(circle at 50% 20%,#263d62,#09111d 65%);display:flex;align-items:center;justify-content:center;padding:16px}
+#lobby.hidden{display:none}
+.lobbyCard{width:min(1000px,96vw);max-height:94vh;overflow:auto;background:#101b2b;border:1px solid #ffffff2c;border-radius:22px;padding:18px;box-shadow:0 24px 90px #000b}
+.lobbyTop{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.lobbyPlayer{display:flex;gap:10px;align-items:center;background:#0a1420;padding:10px 14px;border-radius:14px}
+#lobbyAvatar{font-size:32px}.lobbyName{font-weight:1000;font-size:18px}.lobbySub{font-size:10px;color:#91a6ba}
+.lobbyTitle{text-align:center;margin:12px 0 4px;font-size:30px;font-weight:1000}.lobbyTitle small{display:block;font-size:11px;color:#8fa4b8;letter-spacing:2px}
+.lobbyModes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.lobbyMode{padding:18px 10px;border:1px solid #ffffff20;border-radius:15px;background:#15243a;color:#fff;text-align:center;font-weight:900}
+.lobbyMode.selected{outline:2px solid #63dcff;background:#1b3150}.lobbyMode span{display:block;font-size:10px;color:#8fa4b8;margin-top:4px}
+.lobbySetup{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lobbyBox{background:#0b1623;border:1px solid #ffffff18;border-radius:14px;padding:12px}
+.lobbyBox h3{font-size:12px;margin:0 0 8px;color:#a9bed1}
+#lobbyCiv,#lobbyMap{width:100%;padding:11px;border-radius:10px;background:#111f31;color:#fff;border:1px solid #ffffff26}
+.lobbyActions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:16px}
+#lobbyBattle{padding:16px;border:0;border-radius:14px;background:linear-gradient(90deg,#3ac7ff,#7568ff);color:#fff;font-size:17px;font-weight:1000}
+#lobbyProfile{padding:14px;border-radius:14px;border:1px solid #ffffff25;background:#16263b;color:#fff;font-weight:900}
+.lobbyRecord{font-size:11px;color:#91a6ba;text-align:center;margin-top:10px}
+@media(max-width:700px){.lobbyModes{grid-template-columns:1fr}.lobbySetup{grid-template-columns:1fr}.lobbyTitle{font-size:23px}}
+
+/* 3.2.0 — Player-facing lobby: admin controls hidden */
+#admin,#adminPanel,.admin,.adminPanel,[id^="admin"]:not(#adminHidden){display:none!important}
+
+/* 3.2.0 — Main Home Lobby */
+#lobby{background:radial-gradient(circle at 50% 38%,#174f78 0,#102d50 38%,#07101d 78%);padding:12px}
+.lobbyCard{position:relative;width:min(1180px,97vw);height:min(690px,94vh);overflow:hidden;background:linear-gradient(#15395d,#0b1a2d);border:1px solid #ffffff30;border-radius:24px;padding:14px}
+.homeTop{display:grid;grid-template-columns:1.4fr .8fr 1fr;gap:10px;align-items:center}
+.homeProfile,.homeRank,.homeCurrency{background:#0a1422dd;border:1px solid #ffffff25;border-radius:14px;padding:9px 12px}
+.homeProfile{display:flex;gap:10px;align-items:center}.homeProfile .ava{font-size:31px}.homeProfile b{font-size:15px}
+.homeRank{text-align:center}.homeRank .league{font-size:11px;color:#9eb3c9}.homeRank .rp{font-size:20px;font-weight:1000;color:#ffd45d}
+.homeCurrency{display:flex;justify-content:space-around;font-weight:900}.homeCurrency span{white-space:nowrap}
+.homeCenter{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);text-align:center;width:44%}
+.homeCivIcon{font-size:92px;filter:drop-shadow(0 12px 12px #0008)}.homeCivName{font-size:27px;font-weight:1000}.homeCivTrait{font-size:11px;color:#9db4ca}
+.homeLeft,.homeRight{position:absolute;top:105px;display:flex;flex-direction:column;gap:9px}.homeLeft{left:14px}.homeRight{right:14px}
+.sideLobbyBtn{min-width:126px;padding:11px 12px;border-radius:12px;border:1px solid #ffffff25;background:#13253a;color:#fff;font-weight:900;text-align:left}
+.sideLobbyBtn small{display:block;color:#839ab1;font-size:9px;margin-top:2px}
+.homeBottom{position:absolute;left:14px;right:14px;bottom:14px;display:grid;grid-template-columns:190px 1fr 270px;gap:12px;align-items:end}
+.xpBox,.modeBox{background:#0a1422e8;border:1px solid #ffffff25;border-radius:14px;padding:11px}
+.xpLine{height:9px;background:#253449;border-radius:8px;overflow:hidden;margin-top:6px}.xpLine div{height:100%;background:linear-gradient(90deg,#43dbff,#806bff)}
+.modeBox{text-align:center}.modeName{font-size:18px;font-weight:1000}.modeSub{font-size:10px;color:#93a9be}
+#homePlay{height:72px;border:0;border-radius:15px;background:linear-gradient(#ffe052,#f2a900);color:#1b1b1b;font-size:25px;font-weight:1000;box-shadow:0 5px 0 #a66c00}
+#modePicker{position:absolute;inset:0;z-index:3;display:none;align-items:center;justify-content:center;background:#06101be8}
+#modePicker.show{display:flex}.pickerCard{width:min(650px,90%);background:#101d30;border:1px solid #ffffff2a;border-radius:18px;padding:16px}
+.pickerModes{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.pickerMode{padding:18px 8px;border-radius:13px;border:1px solid #ffffff25;background:#172a42;color:#fff;font-weight:900}.pickerMode.selected{outline:2px solid #5edfff}
+.pickerSetup{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.pickerSetup select{width:100%;padding:11px;background:#0b1725;color:#fff;border:1px solid #ffffff25;border-radius:10px}
+#pickerFight{width:100%;margin-top:12px;padding:14px;border:0;border-radius:12px;background:linear-gradient(90deg,#39cbff,#7569ff);color:#fff;font-weight:1000;font-size:16px}
+#rankPath{font-size:10px;color:#9cb1c5;margin-top:3px}
+@media(max-width:800px){.homeBottom{grid-template-columns:130px 1fr 210px}.homeCenter{width:40%}.sideLobbyBtn{min-width:105px;font-size:10px}.homeCivIcon{font-size:68px}}
+</style>
+</head>
+<body>
+<div id="app"><button id="profileBtn" type="button">👤 PROFILE</button>
+<div id="top">
+ <div class="side"><div style="font-size:8px;color:#8fa4b8" id="hudPlayerName">PLAYER</div><div class="name">🗿 TITAN TOWER — <span id="php" style="font-size:1.15em;color:#8cffaa">1400</span> HP</div><div class="bar"><div id="pbar" class="fill"></div></div><div class="towerSystems"><span id="pdef" class="sys">🛡 DEF 400</span><span id="pgen" class="sys">⚡ GEN 350</span><span id="pcore" class="sys core">❤ CORE 650</span></div></div>
+ <div><div id="clock">08:00</div><div id="phase">READY</div><div id="mechanic" style="text-align:center;font-size:9px;color:#8fa2b7;margin-top:2px"></div><div id="combatHint" style="text-align:center;font-size:8px;color:#728398;margin-top:1px">AoE • Flying • Healing • Summons</div></div>
+ <div class="side enemy"><div class="name">🌋 VOLCANIS TOWER — <span id="ehp" style="font-size:1.15em;color:#ff9a7d">1400</span> HP</div><div class="bar"><div id="ebar" class="fill"></div></div><div class="towerSystems"><span id="edef" class="sys">🛡 DEF 400</span><span id="egen" class="sys">⚡ GEN 350</span><span id="ecore" class="sys core">❤ CORE 650</span></div></div>
+</div>
+<div id="stage">
+ <canvas id="c"></canvas><div style="position:absolute;left:8px;top:8px;z-index:9;font-size:8px;color:#9fb3c7">v1.6.0</div><div style="position:absolute;left:8px;top:8px;z-index:9;font-size:8px;color:#9fb3c7">v3.2.1</div><div id="laneThreat" style="position:absolute;right:8px;bottom:8px;z-index:8;padding:4px 7px;border-radius:8px;background:#07101baa;border:1px solid #ffffff20;font-size:8px;color:#cfe7ff;pointer-events:none">TOP • MID • BOT</div><div id="combatStatus" style="position:absolute;left:8px;bottom:8px;z-index:8;padding:4px 7px;border-radius:8px;background:#07101baa;border:1px solid #ffffff20;font-size:8px;color:#cfe7ff;pointer-events:none">3 LANES • MODULE WARFARE</div><div id="mapBadge" class="mapBadge">🏔️ TITAN VALLEY</div><div id="adminPanel" class="adminPanel"><h3>👑 ADMIN TEST TOOLS</h3><div class="adminGrid"><button type="button" id="admEnergy">∞ ENERGY</button><button type="button" id="admUlt">ULT 100%</button><button type="button" id="admEnemy50">ENEMY 50%</button><button type="button" id="admBreakDef">BREAK DEF</button><button type="button" id="admBreakGen">BREAK GEN</button><button type="button" id="admCore25">CORE 25%</button><button type="button" id="admSpawn">SPAWN ELITE</button><button type="button" id="admReset">RESET</button></div><div id="adminStatus" class="adminStatus">Admin ready</div></div><div id="tip">Choose a troop, then tap a lane • TOP→DEF • MID→GEN • BOT→CORE ⚔️</div><div id="msg"></div>
+ <button type="button" id="again" class="play">PLAY AGAIN 🔥</button>
+ <div id="languageSelect" style="position:absolute;z-index:100;inset:0;background:radial-gradient(circle at 50% 35%,#182a42,#050912 70%);display:flex;align-items:center;justify-content:center">
+<div style="width:min(520px,88vw);padding:30px;border:1px solid #ffffff2a;border-radius:24px;background:#101b2beF;box-shadow:0 25px 90px #000;text-align:center">
+<div style="font-size:48px">🏰⚔️</div>
+<h1 style="margin:8px 0;font-size:34px">TOWER CLASH</h1>
+<div style="color:#aebed0;margin:10px 0 22px">Choose your language • Choisis ta langue</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<button type="button" id="langEN" style="padding:18px;border-radius:14px;border:1px solid #ffffff35;background:#1b2b40;color:white;font-weight:900;font-size:17px">🇬🇧 ENGLISH</button>
+<button type="button" id="langFR" style="padding:18px;border-radius:14px;border:1px solid #ffffff35;background:#1b2b40;color:white;font-weight:900;font-size:17px">🇫🇷 FRANÇAIS</button>
+</div></div></div>
+<div id="battleBanner"></div>
+
+
+<div id="lobby">
+ <div class="lobbyCard">
+  <div class="homeTop">
+   <div class="homeProfile"><div id="lobbyAvatar" class="ava">🛡️</div><div><b id="lobbyName">Player</b><div class="lobbySub">LEVEL <span id="homeLevel">1</span> • <span id="homeRecord">0W / 0L</span></div></div></div>
+   <div class="homeRank"><div class="league" id="homeLeague">BRONZE</div><div class="rp">🏆 <span id="homeRP">1000</span></div><div id="rankPath">Next league</div></div>
+   <div class="homeCurrency"><span>⚡ <span id="curEnergy">250</span></span><span>🪙 <span id="curCoins">1000</span></span><span>💎 <span id="curGems">10</span></span></div>
+  </div>
+
+  <div class="homeLeft">
+   <button class="sideLobbyBtn" id="homeUnits">🪖 UNITS<small>225 troops</small></button>
+   <button class="sideLobbyBtn" id="homeCivs">🏰 CIVILIZATIONS<small>15 factions</small></button>
+   <button class="sideLobbyBtn" id="homeAchievements">🏅 ACHIEVEMENTS<small>Your medals</small></button>
+  </div>
+  <div class="homeRight">
+   <button class="sideLobbyBtn" id="homeProfile">👤 PROFILE<small>Stats & history</small></button>
+   <button class="sideLobbyBtn" id="homeRanked">🏆 RANKED<small id="rankSideText">1000 RP</small></button>
+   <button class="sideLobbyBtn" id="homeSettings">⚙️ SETTINGS<small>Language & options</small></button>
+  </div>
+
+  <div class="homeCenter">
+   <div id="homeCivIcon" class="homeCivIcon">🗿</div>
+   <div id="homeCivName" class="homeCivName">TITAN</div>
+   <div id="homeCivTrait" class="homeCivTrait">FORTITUDE • Your selected civilization</div>
+  </div>
+
+  <div class="homeBottom">
+   <div class="xpBox"><b>⭐ XP <span id="homeXpText">0/100</span></b><div class="xpLine"><div id="homeXpBar"></div></div></div>
+   <div class="modeBox"><div class="modeName" id="homeModeName">⚔️ CASUAL</div><div class="modeSub" id="homeModeSub">Standard battle • Choose mode before playing</div></div>
+   <button id="homePlay">PLAY</button>
+  </div>
+
+  <div id="modePicker">
+   <div class="pickerCard">
+    <h2 style="margin:0 0 10px;text-align:center">CHOOSE BATTLE</h2>
+    <div class="pickerModes">
+     <button class="pickerMode selected" data-lmode="casual">⚔️ CASUAL</button>
+     <button class="pickerMode" data-lmode="ranked">🏆 RANKED</button>
+     <button class="pickerMode" data-lmode="training">🎯 TRAINING</button>
+    </div>
+    <div class="pickerSetup"><select id="lobbyCiv"></select><select id="lobbyMap"></select></div>
+    <button id="pickerFight">FIND BATTLE</button>
+   </div>
+  </div>
+ </div>
+</div>
+<div id="profilePanel">
+  <div class="profileCard">
+    <div class="profileHead">
+      <div id="profileAvatar">🛡️</div>
+      <div>
+        <div id="profileName">Player</div>
+        <div id="profileRank">BRONZE • 1000 RP</div>
+        <div style="font-size:11px;color:#8fa4b8;margin-top:5px">Level <span id="profileLevel">1</span> • <span id="profileXpTxt">0 / 100 XP</span></div>
+        <div class="profileXp"><div id="profileXpBar" style="width:0%"></div></div>
+      </div>
+      <div style="text-align:right;font-size:12px;color:#9fb2c7">Favorite<br><b id="profileFav">TITAN</b></div>
+    </div>
+
+    <div class="profileGrid">
+      <div class="profileStat"><b id="psWins">0</b><small>Wins</small></div>
+      <div class="profileStat"><b id="psLosses">0</b><small>Losses</small></div>
+      <div class="profileStat"><b id="psBattles">0</b><small>Battles</small></div>
+      <div class="profileStat"><b id="psStreak">0</b><small>Best streak</small></div>
+      <div class="profileStat"><b id="psKills">0</b><small>Kills</small></div>
+      <div class="profileStat"><b id="psDamage">0</b><small>Tower dmg</small></div>
+      <div class="profileStat"><b id="psUnits">0</b><small>Units deployed</small></div>
+      <div class="profileStat"><b id="psMedals">0</b><small>Medals</small></div>
+    </div>
+
+    <div class="profileSection">
+      <h3>⚙️ PROFILE SETTINGS</h3>
+      <div class="profileControls">
+        <input id="profileNameInput" maxlength="18" placeholder="Player name">
+        <select id="profileAvatarSelect">
+          <option>🛡️</option><option>⚔️</option><option>🐉</option><option>👑</option><option>🔥</option><option>❄️</option><option>⚡</option><option>💀</option><option>🌿</option><option>🌌</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="profileSection">
+      <h3>🏅 ACHIEVEMENTS</h3>
+      <div id="profileBadges" class="badgeWrap"></div>
+    </div>
+
+    <div class="profileSection">
+      <h3>🕘 RECENT BATTLES</h3>
+      <div id="profileHistory"></div>
+    </div>
+
+    <div class="profileActions">
+      <button id="profileSave" type="button">💾 SAVE PROFILE</button>
+      <button id="profileClose" type="button">CLOSE</button>
+    </div>
+  </div>
+</div>
+<div id="result"><div class="resultCard"><div id="resultIcon">🏆</div><div id="resultTitle">VICTORY</div><div id="resultStats"></div><button type="button" id="resultAgain" class="resultBtn">⚔️ PLAY AGAIN</button></div></div>
+<div id="start"><div class="card"><div class="logo">🏰 TOWER CLASH ⚔️</div><div class="sub">CHOOSE YOUR CIVILIZATION</div>
+<div id="civPick"><button type="button" class="civ selected" data-civ="titan"><span>🗿</span>TITAN<small style="display:block;color:#a9bdd0;margin-top:5px">Power + Defense</small></button>
+<button type="button" class="civ volc" data-civ="volcanis"><span>🌋</span>VOLCANIS<small style="display:block;color:#ffad86;margin-top:5px">Fire + Destruction</small></button>
+<button type="button" class="civ glacial" data-civ="glacial"><span>❄️</span>GLACIAL<small style="display:block;color:#9eeaff;margin-top:5px">Ice + Control</small></button>
+<button type="button" class="civ necro" data-civ="necromancer"><span>💀</span>NECROMANCER<small style="display:block;color:#d4a9ff;margin-top:5px">Death + Summoning</small></button>
+<button type="button" class="civ tempest" data-civ="tempest"><span>⚡</span>TEMPEST<small style="display:block;color:#ffe98c;margin-top:5px">Lightning + Speed</small></button>
+<button type="button" class="civ" data-civ="verdantia"><span>🌿</span><b>VERDANTIA</b><small>Nature + Healing</small></button>
+<button type="button" class="civ" data-civ="umbral"><span>🌑</span><b>UMBRALIS</b><small>Darkness + Stealth</small></button>
+<button type="button" class="civ" data-civ="solaria"><span>☀️</span><b>SOLARIA</b><small>Light + Power</small></button>
+<button type="button" class="civ" data-civ="aqualis"><span>🌊</span><b>AQUALIS</b><small>Water + Control</small></button>
+<button type="button" class="civ" data-civ="dunara"><span>🏜️</span><b>DUNARA</b><small>Sand + Mobility</small></button>
+<button type="button" class="civ" data-civ="mechanicha"><span>⚙️</span><b>MECHANICHA</b><small>Machines + Upgrade</small></button>
+<button type="button" class="civ" data-civ="dragonalis"><span>🐉</span><b>DRAGONALIS</b><small>Dragons + Rage</small></button>
+<button type="button" class="civ" data-civ="crystalia"><span>💎</span><b>CRYSTALIA</b><small>Crystal + Reflect</small></button>
+<button type="button" class="civ" data-civ="mycelia"><span>🍄</span><b>MYCELIA</b><small>Spores + Infect</small></button>
+<button type="button" class="civ" data-civ="astralis"><span>🌌</span><b>ASTRALIS</b><small>Cosmos + Warp</small></button>
+</div>
+<div class="setupRow"><select id="mapSelect" aria-label="Battle map"><option value="titan">🏔️ Titan Valley</option><option value="volcano">🌋 Volcanic Rift</option><option value="frozen">❄️ Frozen Pass</option><option value="forest">🌿 Ancient Forest</option><option value="desert">🏜️ Desert Ruins</option><option value="foundry">⚙️ Iron Foundry</option><option value="sunken">🌊 Sunken Kingdom</option><option value="astral">🌌 Astral Ruins</option></select><select id="modeSelect" aria-label="Battle mode"><option value="casual">⚔️ CASUAL</option><option value="ranked">🏆 RANKED</option></select><button type="button" id="adminToggle">👑 ADMIN</button></div><div id="rankInfo" class="rankInfo">UNRANKED • Casual battle</div><button type="button" id="play" class="play">START BATTLE 🔥</button></div></div>
+</div>
+<div id="bottom">
+ <div id="energy"><span id="energyTxt">⚡ 5.0 / 10</span><div class="etrack"><div id="efill" class="efill"></div></div></div>
+ <div id="buttons">
+  <button type="button" class="unitBtn sel" data-u="warrior"><b>⚔️</b>Titan Warrior<small>⚡ 2</small></button>
+  <button type="button" class="unitBtn" data-u="stoneguard"><b>🛡️</b>Stone Guard<small>⚡ 3</small></button>
+  <button type="button" class="unitBtn" data-u="thrower"><b>🪨</b>Boulder Thrower<small>⚡ 3</small></button>
+  <button type="button" class="unitBtn" data-u="archer"><b>🏹</b>Titan Archer<small>⚡ 3</small></button>
+  <button type="button" class="unitBtn" data-u="crusher"><b>💥</b>Earth Crusher<small>⚡ 4</small></button>
+  <button type="button" class="unitBtn" data-u="colossus"><b>🗿</b>Iron Colossus<small>⚡ 5</small></button>
+  <button type="button" class="unitBtn" data-u="mountainguard"><b>⛰️</b>Mountain Guard<small>⚡ 4</small></button>
+  <button type="button" class="unitBtn" data-u="berserker"><b>🪓</b>Titan Berserker<small>⚡ 4</small></button>
+  <button type="button" class="unitBtn" data-u="mage"><b>✨</b>Earth Mage<small>⚡ 5</small></button>
+  <button type="button" class="unitBtn" data-u="siege"><b>🎯</b>Siege Titan<small>⚡ 6</small></button>
+  <button type="button" class="unitBtn" data-u="beast"><b>🐗</b>Granite Beast<small>⚡ 5</small></button>
+  <button type="button" class="unitBtn" data-u="commander"><b>👑</b>Titan Commander<small>⚡ 6</small></button>
+  <button type="button" class="unitBtn" data-u="giant"><b>🗿</b>Mountain Giant<small>⚡ 7</small></button>
+  <button type="button" class="unitBtn" data-u="worldbreaker"><b>💢</b>Worldbreaker<small>⚡ 8</small></button>
+  <button type="button" class="unitBtn" data-u="emperor"><b>👑</b>Titan Emperor<small>⚡ 10</small></button>
+ </div>
+ <div id="powers"><button type="button" id="meteor" class="powerBtn">☄️ METEOR</button><button type="button" id="shield" class="powerBtn">🛡️ SHIELD</button><button type="button" id="ultimate" class="powerBtn">👑 TITAN QUAKE 0%</button></div>
+</div>
+</div>
+<script>
+window.addEventListener('error',e=>{let L=document.getElementById('lobby');if(L)L.style.display='flex';console.error(e.error||e.message)});
+
+(()=>{
+window.addEventListener('error',function(e){
+  console.error('Tower Clash error:',e.message);
+});
+let gameLang='en';
+const FR_TEXT={
+ 'CHOOSE YOUR CIVILIZATION':'CHOISIS TA CIVILISATION',
+ 'START BATTLE 🔥':'COMMENCER LE COMBAT 🔥',
+ 'Choose a troop, then tap a lane • TOP→DEF • MID→GEN • BOT→CORE ⚔️':'Choisis une troupe, puis touche une voie ⚔️',
+ '⚔️ BATTLE':'⚔️ COMBAT',
+ 'READY':'PRÊT',
+ 'VICTORY!':'VICTOIRE !',
+ 'DEFEAT':'DÉFAITE',
+ '⚔️ PLAY AGAIN':'⚔️ REJOUER',
+ 'Battle time:':'Durée du combat :',
+ 'Units deployed:':'Troupes déployées :',
+ 'Civilization:':'Civilisation :',
+ 'Power + Defense':'Puissance + Défense',
+ 'Fire + Destruction':'Feu + Destruction',
+ 'Ice + Control':'Glace + Contrôle',
+ 'Death + Summoning':'Mort + Invocation',
+ 'Lightning + Speed':'Foudre + Vitesse',
+ 'Nature + Healing':'Nature + Soin',
+ 'Darkness + Stealth':'Ténèbres + Furtivité',
+ 'Light + Power':'Lumière + Puissance',
+ 'Water + Control':'Eau + Contrôle',
+ 'Sand + Mobility':'Sable + Mobilité',
+ 'Machines + Upgrade':'Machines + Amélioration', 'Dragons + Rage':'Dragons + Rage', 'Crystal + Reflect':'Cristal + Réflexion', 'Spores + Infect':'Spores + Infection', 'Cosmos + Warp':'Cosmos + Téléportation'
+};
+function translateUI(){
+ if(gameLang!=='fr')return;
+ document.querySelectorAll('body *').forEach(el=>{
+   if(el.children.length===0){
+     let t=el.textContent.trim();
+     if(FR_TEXT[t])el.textContent=FR_TEXT[t];
+   }
+ });
+ const hint=document.querySelector('#combatHint');
+ if(hint)hint.textContent='Zone • Vol • Soin • Invocations';
+}
+function chooseLanguage(lang){
+ gameLang=lang;
+ document.documentElement.lang=lang;
+ document.getElementById('languageSelect').style.display='none';
+ if(lang==='fr')translateUI();
+}
+
+
+const c=document.getElementById('c'),x=c.getContext('2d'),msg=document.getElementById('msg'),start=document.getElementById('start'),again=document.getElementById('again');
+let W=1,H=1,D=1;
+function resize(){let r=c.getBoundingClientRect();W=r.width;H=r.height;D=Math.min(2,devicePixelRatio||1);c.width=W*D;c.height=H*D;x.setTransform(D,0,0,D,0,0)}
+addEventListener('resize',resize);resize();
+const P={
+warrior:{cost:2,hp:135,sp:65,dm:25,rg:25,cd:.55,r:14},
+stoneguard:{cost:3,hp:210,sp:43,dm:18,rg:25,cd:.70,r:16},
+thrower:{cost:3,hp:90,sp:51,dm:22,rg:125,cd:.82,r:13},
+archer:{cost:3,hp:80,sp:58,dm:18,rg:145,cd:.72,r:12},
+crusher:{cost:4,hp:190,sp:46,dm:43,rg:32,cd:1,r:18},
+colossus:{cost:5,hp:330,sp:31,dm:34,rg:29,cd:.9,r:20},
+mountainguard:{cost:4,hp:270,sp:38,dm:22,rg:26,cd:.72,r:18},
+berserker:{cost:4,hp:150,sp:74,dm:39,rg:28,cd:.55,r:15},
+mage:{cost:5,hp:115,sp:48,dm:34,rg:135,cd:.95,r:14},
+siege:{cost:6,hp:230,sp:30,dm:62,rg:170,cd:1.35,r:19},
+beast:{cost:5,hp:245,sp:67,dm:36,rg:27,cd:.68,r:18},
+commander:{cost:6,hp:220,sp:53,dm:42,rg:30,cd:.72,r:18},
+giant:{cost:7,hp:420,sp:29,dm:58,rg:34,cd:1.0,r:22},
+worldbreaker:{cost:8,hp:470,sp:27,dm:76,rg:36,cd:1.15,r:24},
+emperor:{cost:10,hp:560,sp:35,dm:88,rg:42,cd:1.0,r:26}
+};
+const E={
+lava:{cost:2,hp:120,sp:70,dm:27,rg:25,cd:.56,r:14},magma:{cost:3,hp:215,sp:42,dm:23,rg:26,cd:.72,r:16},
+firearcher:{cost:3,hp:82,sp:56,dm:20,rg:145,cd:.75,r:12},ash:{cost:3,hp:92,sp:82,dm:31,rg:25,cd:.55,r:13},
+golem:{cost:4,hp:250,sp:36,dm:38,rg:29,cd:.9,r:18},flamemage:{cost:4,hp:105,sp:49,dm:31,rg:130,cd:.88,r:14},
+magmabeast:{cost:5,hp:245,sp:61,dm:39,rg:28,cd:.7,r:18},inferno:{cost:5,hp:260,sp:49,dm:44,rg:31,cd:.8,r:18},
+bomber:{cost:5,hp:125,sp:44,dm:50,rg:155,cd:1.15,r:15},drake:{cost:6,hp:225,sp:68,dm:47,rg:75,cd:.78,r:18},
+obsidian:{cost:6,hp:390,sp:29,dm:34,rg:27,cd:.85,r:21},eruption:{cost:6,hp:285,sp:53,dm:53,rg:32,cd:.9,r:20},
+magmatitan:{cost:7,hp:430,sp:30,dm:61,rg:34,cd:1,r:23},dragon:{cost:8,hp:390,sp:60,dm:70,rg:100,cd:.9,r:24},
+volcemperor:{cost:10,hp:550,sp:35,dm:90,rg:43,cd:1,r:26}
+};
+
+
+const G={
+frost:{cost:2,hp:125,sp:62,dm:23,rg:25,cd:.58,r:14},icearcher:{cost:3,hp:82,sp:54,dm:19,rg:145,cd:.78,r:12},
+snowscout:{cost:2,hp:78,sp:84,dm:17,rg:24,cd:.48,r:12},frozenguard:{cost:3,hp:225,sp:40,dm:18,rg:25,cd:.72,r:16},
+frostmage:{cost:4,hp:105,sp:48,dm:29,rg:132,cd:.9,r:14},icewolf:{cost:3,hp:130,sp:82,dm:24,rg:25,cd:.55,r:14},
+glacierwarrior:{cost:4,hp:190,sp:55,dm:34,rg:28,cd:.68,r:16},cryoknight:{cost:5,hp:260,sp:48,dm:39,rg:30,cd:.78,r:18},
+snowgolem:{cost:5,hp:335,sp:31,dm:35,rg:29,cd:.9,r:20},icewitch:{cost:5,hp:115,sp:48,dm:34,rg:140,cd:.92,r:14},
+frozenbeast:{cost:5,hp:250,sp:65,dm:36,rg:28,cd:.68,r:18},glacierguardian:{cost:6,hp:390,sp:30,dm:34,rg:27,cd:.86,r:21},
+frostgiant:{cost:7,hp:430,sp:29,dm:59,rg:34,cd:1,r:23},yeti:{cost:8,hp:475,sp:35,dm:70,rg:35,cd:.92,r:24},
+iceemperor:{cost:10,hp:560,sp:36,dm:87,rg:42,cd:1,r:26}
+};
+const N={
+skeleton:{cost:2,hp:100,sp:66,dm:23,rg:24,cd:.55,r:13},bonearcher:{cost:2,hp:72,sp:55,dm:18,rg:142,cd:.75,r:12},
+gravewalker:{cost:2,hp:145,sp:45,dm:20,rg:24,cd:.68,r:14},skeletonknight:{cost:3,hp:190,sp:52,dm:30,rg:27,cd:.68,r:16},
+ghoul:{cost:3,hp:135,sp:76,dm:27,rg:24,cd:.5,r:14},darkpriest:{cost:4,hp:100,sp:45,dm:26,rg:130,cd:.9,r:14},
+bonegolem:{cost:5,hp:340,sp:30,dm:37,rg:29,cd:.9,r:20},soulhunter:{cost:4,hp:135,sp:70,dm:34,rg:45,cd:.62,r:15},
+gravemage:{cost:5,hp:110,sp:47,dm:35,rg:138,cd:.92,r:14},deathknight:{cost:5,hp:275,sp:48,dm:43,rg:30,cd:.76,r:18},
+corpsebeast:{cost:5,hp:255,sp:62,dm:38,rg:27,cd:.66,r:18},soulreaper:{cost:6,hp:190,sp:61,dm:49,rg:35,cd:.72,r:17},
+lich:{cost:7,hp:180,sp:43,dm:57,rg:155,cd:1,r:18},necrodragon:{cost:8,hp:405,sp:59,dm:72,rg:100,cd:.9,r:24},
+deathemperor:{cost:10,hp:555,sp:36,dm:91,rg:43,cd:1,r:26}
+};
+const T={
+storm:{cost:2,hp:112,sp:78,dm:24,rg:24,cd:.5,r:13},sparkarcher:{cost:3,hp:78,sp:66,dm:19,rg:143,cd:.68,r:12},
+lightningscout:{cost:2,hp:72,sp:98,dm:17,rg:23,cd:.42,r:11},thunderguard:{cost:3,hp:205,sp:52,dm:20,rg:25,cd:.65,r:16},
+voltmage:{cost:4,hp:98,sp:59,dm:30,rg:135,cd:.78,r:14},stormwolf:{cost:3,hp:120,sp:96,dm:24,rg:24,cd:.47,r:14},
+thunderknight:{cost:4,hp:185,sp:72,dm:34,rg:28,cd:.6,r:16},lightningassassin:{cost:4,hp:112,sp:105,dm:36,rg:25,cd:.48,r:14},
+stormgolem:{cost:5,hp:300,sp:43,dm:36,rg:29,cd:.8,r:20},cyclonerider:{cost:5,hp:165,sp:91,dm:38,rg:35,cd:.58,r:16},
+thunderbeast:{cost:5,hp:220,sp:86,dm:39,rg:27,cd:.58,r:18},stormcaller:{cost:6,hp:130,sp:60,dm:46,rg:145,cd:.82,r:15},
+lightningtitan:{cost:7,hp:390,sp:49,dm:60,rg:34,cd:.85,r:23},tempestdragon:{cost:8,hp:365,sp:80,dm:70,rg:100,cd:.75,r:24},
+stormemperor:{cost:10,hp:520,sp:52,dm:89,rg:42,cd:.84,r:26}
+};
+
+const CIVSTYLE={
+ titan:{base:'#748da5',dark:'#35485b',accent:'#d8f4ff',glow:'#7de7ff'},
+ volcanis:{base:'#a7442e',dark:'#5d281f',accent:'#ff9b52',glow:'#ff6a35'},
+ glacial:{base:'#8ac7de',dark:'#365765',accent:'#d7f8ff',glow:'#7deaff'},
+ necromancer:{base:'#6f5988',dark:'#2d2438',accent:'#c68cff',glow:'#ad63ff'},
+ tempest:{base:'#7c7a56',dark:'#3c3a26',accent:'#ffe56a',glow:'#fff06a'},
+ verdantia:{base:'#4f7b55',dark:'#25452b',accent:'#9de78d',glow:'#78ef8c'},
+ umbral:{base:'#3b3150',dark:'#171320',accent:'#9b67ff',glow:'#7c4cff'},
+ solaria:{base:'#b48a3d',dark:'#5a431f',accent:'#ffe56b',glow:'#fff2a1'},
+ aqualis:{base:'#3f7891',dark:'#1f4659',accent:'#64dfff',glow:'#72edff'},
+ dunara:{base:'#9c7741',dark:'#50391d',accent:'#e8c47a',glow:'#ffd88a'},
+ mechanicha:{base:'#687681',dark:'#273039',accent:'#ffb84d',glow:'#7fe8ff'}, dragonalis:{base:'#8c3e35',dark:'#351b1a',accent:'#ffcf68',glow:'#ff684f'}, crystalia:{base:'#6d63a9',dark:'#2e2857',accent:'#d9c8ff',glow:'#9ff6ff'}, mycelia:{base:'#76577f',dark:'#33233b',accent:'#ef9cff',glow:'#9dff9b'}, astralis:{base:'#394d86',dark:'#161d43',accent:'#b9c8ff',glow:'#8fe7ff'}
+};
+const META={
+ warrior:{kind:'human',weapon:'sword',scale:1.0,accent:'#d8f4ff'},
+ stoneguard:{kind:'human',weapon:'shield',scale:1.08,accent:'#cce7ff'},
+ thrower:{kind:'human',weapon:'rock',scale:1.0,accent:'#c9d0d6'},
+ archer:{kind:'human',weapon:'bow',scale:.98,accent:'#e5f5ff'},
+ crusher:{kind:'human',weapon:'hammer',scale:1.15,accent:'#d5dde5'},
+ colossus:{kind:'golem',weapon:'fists',scale:1.28,accent:'#9fb5c7'},
+ mountainguard:{kind:'human',weapon:'towerShield',scale:1.15,accent:'#d9efff'},
+ berserker:{kind:'human',weapon:'axe',scale:1.08,accent:'#ffd3a6'},
+ mage:{kind:'mage',weapon:'staff',scale:1.02,accent:'#bde9ff'},
+ siege:{kind:'siege',weapon:'launcher',scale:1.22,accent:'#cfd9df'},
+ beast:{kind:'beast',weapon:'tusks',scale:1.18,accent:'#aebac3'},
+ commander:{kind:'human',weapon:'banner',scale:1.16,accent:'#ffe46b'},
+ giant:{kind:'giant',weapon:'club',scale:1.4,accent:'#d9e1e7'},
+ worldbreaker:{kind:'giant',weapon:'maul',scale:1.52,accent:'#ffcf78'},
+ emperor:{kind:'emperor',weapon:'greatsword',scale:1.48,accent:'#ffe46b'},
+ lava:{kind:'human',weapon:'sword',scale:1.0,accent:'#ff8d52'},
+ magma:{kind:'human',weapon:'shield',scale:1.08,accent:'#ff9c63'},
+ firearcher:{kind:'human',weapon:'bow',scale:.98,accent:'#ffb06c'},
+ ash:{kind:'assassin',weapon:'daggers',scale:.95,accent:'#d58b75'},
+ golem:{kind:'golem',weapon:'fists',scale:1.25,accent:'#ff7044'},
+ flamemage:{kind:'mage',weapon:'staff',scale:1.02,accent:'#ff8d42'},
+ magmabeast:{kind:'beast',weapon:'tusks',scale:1.18,accent:'#ff7044'},
+ inferno:{kind:'human',weapon:'greatsword',scale:1.18,accent:'#ff984f'},
+ bomber:{kind:'siege',weapon:'bomb',scale:1.05,accent:'#ff8b3d'},
+ drake:{kind:'dragon',weapon:'flame',scale:1.12,accent:'#ff8650'},
+ obsidian:{kind:'golem',weapon:'shield',scale:1.30,accent:'#7a4b43'},
+ eruption:{kind:'beast',weapon:'slam',scale:1.22,accent:'#ff6b39'},
+ magmatitan:{kind:'giant',weapon:'maul',scale:1.42,accent:'#ff7c45'},
+ dragon:{kind:'dragon',weapon:'flame',scale:1.42,accent:'#ff6a32'},
+ volcemperor:{kind:'emperor',weapon:'greatsword',scale:1.5,accent:'#ffd05a'},
+frost:{kind:'human',weapon:'sword',scale:1,accent:'#9eeaff'},icearcher:{kind:'human',weapon:'bow',scale:.98,accent:'#b8f1ff'},snowscout:{kind:'assassin',weapon:'daggers',scale:.92,accent:'#e8fbff'},frozenguard:{kind:'human',weapon:'shield',scale:1.08,accent:'#9eeaff'},frostmage:{kind:'mage',weapon:'staff',scale:1.02,accent:'#72ddff'},icewolf:{kind:'beast',weapon:'tusks',scale:1.0,accent:'#d9f8ff'},glacierwarrior:{kind:'human',weapon:'axe',scale:1.08,accent:'#8be4ff'},cryoknight:{kind:'human',weapon:'greatsword',scale:1.16,accent:'#b8f1ff'},snowgolem:{kind:'golem',weapon:'fists',scale:1.25,accent:'#d8fbff'},icewitch:{kind:'mage',weapon:'staff',scale:1.02,accent:'#c4edff'},frozenbeast:{kind:'beast',weapon:'tusks',scale:1.18,accent:'#9eeaff'},glacierguardian:{kind:'golem',weapon:'shield',scale:1.3,accent:'#78d9ff'},frostgiant:{kind:'giant',weapon:'club',scale:1.42,accent:'#bdefff'},yeti:{kind:'beast',weapon:'slam',scale:1.45,accent:'#f1fdff'},iceemperor:{kind:'emperor',weapon:'greatsword',scale:1.5,accent:'#c9f5ff'},
+skeleton:{kind:'human',weapon:'sword',scale:.95,accent:'#e7e2d3'},bonearcher:{kind:'human',weapon:'bow',scale:.92,accent:'#e7e2d3'},gravewalker:{kind:'human',weapon:'sword',scale:1,accent:'#9c78bd'},skeletonknight:{kind:'human',weapon:'shield',scale:1.05,accent:'#d8d0bf'},ghoul:{kind:'beast',weapon:'tusks',scale:.95,accent:'#9fc083'},darkpriest:{kind:'mage',weapon:'staff',scale:1,accent:'#c187ff'},bonegolem:{kind:'golem',weapon:'fists',scale:1.25,accent:'#ddd4c0'},soulhunter:{kind:'assassin',weapon:'daggers',scale:1.05,accent:'#b87cff'},gravemage:{kind:'mage',weapon:'staff',scale:1,accent:'#aa6cff'},deathknight:{kind:'human',weapon:'greatsword',scale:1.16,accent:'#a36ee0'},corpsebeast:{kind:'beast',weapon:'tusks',scale:1.18,accent:'#78936d'},soulreaper:{kind:'human',weapon:'axe',scale:1.18,accent:'#cf8cff'},lich:{kind:'mage',weapon:'staff',scale:1.18,accent:'#c977ff'},necrodragon:{kind:'dragon',weapon:'flame',scale:1.4,accent:'#b478ff'},deathemperor:{kind:'emperor',weapon:'greatsword',scale:1.5,accent:'#d19aff'},
+storm:{kind:'human',weapon:'sword',scale:1,accent:'#ffe56a'},sparkarcher:{kind:'human',weapon:'bow',scale:.98,accent:'#fff09a'},lightningscout:{kind:'assassin',weapon:'daggers',scale:.9,accent:'#fff4a8'},thunderguard:{kind:'human',weapon:'shield',scale:1.08,accent:'#ffe56a'},voltmage:{kind:'mage',weapon:'staff',scale:1,accent:'#fff36e'},stormwolf:{kind:'beast',weapon:'tusks',scale:1,accent:'#e6e9ef'},thunderknight:{kind:'human',weapon:'greatsword',scale:1.12,accent:'#ffe66b'},lightningassassin:{kind:'assassin',weapon:'daggers',scale:.98,accent:'#fff08a'},stormgolem:{kind:'golem',weapon:'fists',scale:1.23,accent:'#ffe56a'},cyclonerider:{kind:'beast',weapon:'slam',scale:1.12,accent:'#d9f4ff'},thunderbeast:{kind:'beast',weapon:'tusks',scale:1.17,accent:'#ffea6d'},stormcaller:{kind:'mage',weapon:'staff',scale:1.05,accent:'#fff36e'},lightningtitan:{kind:'giant',weapon:'maul',scale:1.4,accent:'#ffe45c'},tempestdragon:{kind:'dragon',weapon:'flame',scale:1.4,accent:'#fff06a'},stormemperor:{kind:'emperor',weapon:'greatsword',scale:1.5,accent:'#ffe75f'},
+vine:{kind:'human',weapon:'sword',scale:1.0,accent:'#9de78d'},thornarcher:{kind:'human',weapon:'bow',scale:.98,accent:'#b5f09f'},forestscout:{kind:'assassin',weapon:'daggers',scale:.92,accent:'#aee99a'},rootguard:{kind:'human',weapon:'towerShield',scale:1.1,accent:'#9de78d'},naturemage:{kind:'mage',weapon:'staff',scale:1.03,accent:'#7ee98f'},wolfrider:{kind:'beast',weapon:'tusks',scale:1.1,accent:'#88d67f'},vinebeast:{kind:'beast',weapon:'tusks',scale:1.18,accent:'#7edc7a'},treewarrior:{kind:'golem',weapon:'fists',scale:1.22,accent:'#9fcf87'},poisonflower:{kind:'mage',weapon:'staff',scale:1.0,accent:'#d67adf'},forestguardian:{kind:'human',weapon:'shield',scale:1.18,accent:'#a9e495'},treant:{kind:'golem',weapon:'fists',scale:1.42,accent:'#86be75'},naturewitch:{kind:'mage',weapon:'staff',scale:1.05,accent:'#a7ff9f'},wildtitan:{kind:'giant',weapon:'club',scale:1.42,accent:'#9edb8b'},forestdragon:{kind:'dragon',weapon:'flame',scale:1.38,accent:'#8feb92'},verdantemperor:{kind:'emperor',weapon:'greatsword',scale:1.5,accent:'#b7ff9f'},
+shadow:{kind:'human',weapon:'sword',scale:1.0,accent:'#9b67ff'},darkarcher:{kind:'human',weapon:'bow',scale:.98,accent:'#aa7cff'},nightscout:{kind:'assassin',weapon:'daggers',scale:.9,accent:'#8f6bba'},shadowguard:{kind:'human',weapon:'shield',scale:1.08,accent:'#8e66c7'},voidassassin:{kind:'assassin',weapon:'daggers',scale:.96,accent:'#b26dff'},darkmage:{kind:'mage',weapon:'staff',scale:1.02,accent:'#a15fff'},phantomwolf:{kind:'beast',weapon:'tusks',scale:1.05,accent:'#7b62a0'},shadowknight:{kind:'human',weapon:'greatsword',scale:1.16,accent:'#986cd9'},nightstalker:{kind:'assassin',weapon:'daggers',scale:1.0,accent:'#8d5fd4'},wraith:{kind:'mage',weapon:'staff',scale:1.0,accent:'#b899ff'},darkbeast:{kind:'beast',weapon:'tusks',scale:1.2,accent:'#6f4e8d'},shadowlord:{kind:'emperor',weapon:'greatsword',scale:1.25,accent:'#a46eff'},abyssknight:{kind:'human',weapon:'maul',scale:1.25,accent:'#9d6cff'},voiddragon:{kind:'dragon',weapon:'flame',scale:1.4,accent:'#8e59ff'},umbralemperor:{kind:'emperor',weapon:'greatsword',scale:1.5,accent:'#c080ff'},
+sunsoldier:{kind:'human',weapon:'sword',scale:1.0,accent:'#ffe56b'},lightarcher:{kind:'human',weapon:'bow',scale:.98,accent:'#fff0a1'},solarscout:{kind:'assassin',weapon:'daggers',scale:.92,accent:'#ffed8a'},radiantguard:{kind:'human',weapon:'shield',scale:1.1,accent:'#ffe56b'},sunmage:{kind:'mage',weapon:'staff',scale:1.03,accent:'#fff074'},lightknight:{kind:'human',weapon:'greatsword',scale:1.14,accent:'#ffe26a'},solarbeast:{kind:'beast',weapon:'tusks',scale:1.15,accent:'#f1c85f'},radiantassassin:{kind:'assassin',weapon:'daggers',scale:.97,accent:'#fff2aa'},sungolem:{kind:'golem',weapon:'fists',scale:1.25,accent:'#e7c35b'},phoenixrider:{kind:'dragon',weapon:'flame',scale:1.15,accent:'#ff9f4d'},solarguardian:{kind:'human',weapon:'towerShield',scale:1.22,accent:'#fff0a0'},lightpriest:{kind:'mage',weapon:'staff',scale:1.03,accent:'#fff5b3'},solartitan:{kind:'giant',weapon:'maul',scale:1.4,accent:'#f3d36a'},lightphoenix:{kind:'dragon',weapon:'flame',scale:1.35,accent:'#ffbe55'},solaremperor:{kind:'emperor',weapon:'greatsword',scale:1.5,accent:'#fff1a0'},
+tide:{kind:'human',weapon:'sword',scale:1.0,accent:'#64dfff'},waterarcher:{kind:'human',weapon:'bow',scale:.98,accent:'#7ee8ff'},wavescout:{kind:'assassin',weapon:'daggers',scale:.92,accent:'#6adfff'},coralguard:{kind:'human',weapon:'shield',scale:1.12,accent:'#ef8cae'},watermage:{kind:'mage',weapon:'staff',scale:1.03,accent:'#63dfff'},sharkrider:{kind:'beast',weapon:'tusks',scale:1.15,accent:'#62cfe8'},tidebeast:{kind:'beast',weapon:'tusks',scale:1.18,accent:'#4fc4e0'},seaknight:{kind:'human',weapon:'greatsword',scale:1.15,accent:'#74e5ff'},watergolem:{kind:'golem',weapon:'fists',scale:1.27,accent:'#54cde8'},krakenspawn:{kind:'beast',weapon:'tusks',scale:1.25,accent:'#9a78c8'},oceanguardian:{kind:'human',weapon:'towerShield',scale:1.23,accent:'#66dfff'},stormserpent:{kind:'dragon',weapon:'flame',scale:1.2,accent:'#69e7ff'},deepseatitan:{kind:'giant',weapon:'maul',scale:1.42,accent:'#50cde6'},kraken:{kind:'beast',weapon:'tusks',scale:1.5,accent:'#8b6ab5'},oceanemperor:{kind:'emperor',weapon:'greatsword',scale:1.5,accent:'#7ceaff'},
+sand:{kind:'human',weapon:'sword',scale:1.0,accent:'#e8c47a'},sandarcher:{kind:'human',weapon:'bow',scale:.98,accent:'#f0cf88'},dunescout:{kind:'assassin',weapon:'daggers',scale:.92,accent:'#ddb66d'},desertguard:{kind:'human',weapon:'shield',scale:1.1,accent:'#d8ad64'},sandmage:{kind:'mage',weapon:'staff',scale:1.03,accent:'#efc979'},scorpionrider:{kind:'beast',weapon:'tusks',scale:1.12,accent:'#ba8647'},sandbeast:{kind:'beast',weapon:'tusks',scale:1.18,accent:'#c08a49'},desertassassin:{kind:'assassin',weapon:'daggers',scale:.96,accent:'#e2b76b'},sandgolem:{kind:'golem',weapon:'fists',scale:1.25,accent:'#c9a26a'},dunerider:{kind:'beast',weapon:'tusks',scale:1.15,accent:'#d1a75e'},miragewarrior:{kind:'assassin',weapon:'sword',scale:1.05,accent:'#f0d08b'},desertguardian:{kind:'human',weapon:'towerShield',scale:1.2,accent:'#e2bb73'},sandtitan:{kind:'giant',weapon:'maul',scale:1.4,accent:'#cf9e59'},sphinx:{kind:'beast',weapon:'tusks',scale:1.4,accent:'#e0b45e'},duneemperor:{kind:'emperor',weapon:'greatsword',scale:1.5,accent:'#f2cf86'}
+};
+
+const lanes=[.31,.51,.71], btns=[...document.querySelectorAll('.unitBtn')];
+
+// ===== TOWER CLASH 1.1: FIVE NEW CIVILIZATIONS =====
+const V={ // Verdantia
+ vine:{hp:125,sp:48,dm:19,rg:25,cd:.82,r:12},thornarcher:{hp:82,sp:43,dm:22,rg:128,cd:1.05,r:10},
+ forestscout:{hp:76,sp:70,dm:15,rg:24,cd:.55,r:9},rootguard:{hp:235,sp:29,dm:18,rg:25,cd:1.05,r:15},
+ naturemage:{hp:98,sp:38,dm:24,rg:118,cd:1.2,r:11},wolfrider:{hp:145,sp:66,dm:27,rg:28,cd:.78,r:13},
+ vinebeast:{hp:210,sp:42,dm:31,rg:30,cd:1.0,r:16},treewarrior:{hp:285,sp:25,dm:32,rg:31,cd:1.18,r:17},
+ poisonflower:{hp:92,sp:22,dm:20,rg:142,cd:1.0,r:12},forestguardian:{hp:320,sp:24,dm:30,rg:32,cd:1.15,r:18},
+ treant:{hp:410,sp:19,dm:42,rg:36,cd:1.35,r:21},naturewitch:{hp:120,sp:35,dm:29,rg:135,cd:1.15,r:12},
+ wildtitan:{hp:500,sp:20,dm:52,rg:39,cd:1.42,r:23},forestdragon:{hp:355,sp:53,dm:48,rg:100,cd:1.08,r:20},
+ verdantemperor:{hp:560,sp:24,dm:60,rg:45,cd:1.25,r:24}
+};
+const U={ // Umbralis
+ shadow:{hp:105,sp:57,dm:23,rg:25,cd:.68,r:11},darkarcher:{hp:78,sp:47,dm:25,rg:135,cd:.92,r:10},
+ nightscout:{hp:70,sp:76,dm:18,rg:23,cd:.5,r:9},shadowguard:{hp:205,sp:34,dm:24,rg:27,cd:.92,r:14},
+ voidassassin:{hp:92,sp:75,dm:39,rg:24,cd:.72,r:10},darkmage:{hp:95,sp:40,dm:31,rg:124,cd:1.0,r:11},
+ phantomwolf:{hp:125,sp:72,dm:28,rg:25,cd:.68,r:12},shadowknight:{hp:220,sp:42,dm:36,rg:29,cd:.88,r:15},
+ nightstalker:{hp:145,sp:64,dm:40,rg:28,cd:.76,r:13},wraith:{hp:128,sp:55,dm:35,rg:92,cd:.92,r:12},
+ darkbeast:{hp:255,sp:43,dm:44,rg:31,cd:.95,r:17},shadowlord:{hp:315,sp:38,dm:48,rg:35,cd:1.0,r:18},
+ abyssknight:{hp:370,sp:34,dm:52,rg:34,cd:1.02,r:19},voiddragon:{hp:330,sp:58,dm:55,rg:105,cd:.95,r:20},
+ umbralemperor:{hp:510,sp:30,dm:66,rg:46,cd:1.12,r:23}
+};
+const S={ // Solaria
+ sunsoldier:{hp:130,sp:48,dm:20,rg:25,cd:.78,r:12},lightarcher:{hp:84,sp:44,dm:23,rg:132,cd:1.0,r:10},
+ solarscout:{hp:80,sp:68,dm:17,rg:24,cd:.56,r:9},radiantguard:{hp:245,sp:30,dm:20,rg:27,cd:1.0,r:15},
+ sunmage:{hp:102,sp:38,dm:28,rg:125,cd:1.08,r:11},lightknight:{hp:215,sp:43,dm:33,rg:29,cd:.9,r:15},
+ solarbeast:{hp:230,sp:46,dm:34,rg:30,cd:.96,r:16},radiantassassin:{hp:105,sp:69,dm:40,rg:24,cd:.7,r:10},
+ sungolem:{hp:350,sp:22,dm:39,rg:34,cd:1.25,r:19},phoenixrider:{hp:185,sp:61,dm:39,rg:88,cd:.92,r:15},
+ solarguardian:{hp:385,sp:25,dm:42,rg:36,cd:1.18,r:20},lightpriest:{hp:125,sp:35,dm:21,rg:122,cd:1.15,r:12},
+ solartitan:{hp:510,sp:20,dm:55,rg:40,cd:1.38,r:23},lightphoenix:{hp:325,sp:63,dm:52,rg:108,cd:.92,r:19},
+ solaremperor:{hp:570,sp:26,dm:63,rg:47,cd:1.2,r:24}
+};
+const A={ // Aqualis
+ tide:{hp:120,sp:49,dm:19,rg:25,cd:.8,r:12},waterarcher:{hp:82,sp:45,dm:22,rg:130,cd:1.0,r:10},
+ wavescout:{hp:76,sp:70,dm:16,rg:24,cd:.55,r:9},coralguard:{hp:255,sp:28,dm:19,rg:27,cd:1.04,r:15},
+ watermage:{hp:100,sp:38,dm:26,rg:126,cd:1.12,r:11},sharkrider:{hp:160,sp:63,dm:30,rg:28,cd:.8,r:14},
+ tidebeast:{hp:225,sp:45,dm:33,rg:30,cd:.98,r:16},seaknight:{hp:225,sp:40,dm:34,rg:30,cd:.92,r:15},
+ watergolem:{hp:365,sp:21,dm:38,rg:34,cd:1.28,r:20},krakenspawn:{hp:270,sp:37,dm:43,rg:36,cd:1.05,r:18},
+ oceanguardian:{hp:405,sp:24,dm:43,rg:37,cd:1.2,r:21},stormserpent:{hp:250,sp:57,dm:45,rg:96,cd:.96,r:17},
+ deepseatitan:{hp:525,sp:19,dm:56,rg:41,cd:1.4,r:24},kraken:{hp:590,sp:18,dm:63,rg:46,cd:1.48,r:26},
+ oceanemperor:{hp:565,sp:25,dm:62,rg:48,cd:1.2,r:24}
+};
+const DU={ // Dunara
+ sand:{hp:110,sp:55,dm:20,rg:25,cd:.73,r:11},sandarcher:{hp:78,sp:48,dm:23,rg:132,cd:.95,r:10},
+ dunescout:{hp:72,sp:78,dm:17,rg:23,cd:.5,r:9},desertguard:{hp:215,sp:36,dm:23,rg:27,cd:.92,r:14},
+ sandmage:{hp:94,sp:43,dm:28,rg:122,cd:1.02,r:11},scorpionrider:{hp:145,sp:72,dm:31,rg:28,cd:.72,r:13},
+ sandbeast:{hp:205,sp:54,dm:34,rg:30,cd:.88,r:16},desertassassin:{hp:90,sp:82,dm:42,rg:23,cd:.65,r:10},
+ sandgolem:{hp:330,sp:28,dm:40,rg:34,cd:1.18,r:19},dunerider:{hp:175,sp:74,dm:36,rg:30,cd:.76,r:14},
+ miragewarrior:{hp:185,sp:61,dm:39,rg:30,cd:.8,r:14},desertguardian:{hp:360,sp:31,dm:43,rg:36,cd:1.12,r:20},
+ sandtitan:{hp:475,sp:25,dm:53,rg:40,cd:1.32,r:23},sphinx:{hp:430,sp:32,dm:58,rg:82,cd:1.2,r:22},
+ duneemperor:{hp:530,sp:32,dm:64,rg:46,cd:1.08,r:23}
+};
+const ME={ // Mech
+ mechsoldier:{hp:120,sp:55,dm:21,rg:25,cd:0.62,r:11},
+ mecharcher:{hp:148,sp:54,dm:24,rg:130,cd:0.67,r:12},
+ mechscout:{hp:176,sp:72,dm:27,rg:28,cd:0.71,r:13},
+ mechguard:{hp:284,sp:50,dm:31,rg:29,cd:0.76,r:13},
+ mechmage:{hp:232,sp:49,dm:34,rg:130,cd:0.80,r:14},
+ mechrider:{hp:260,sp:68,dm:37,rg:32,cd:0.84,r:15},
+ mechbeast:{hp:288,sp:46,dm:40,rg:33,cd:0.89,r:16},
+ mechknight:{hp:316,sp:44,dm:43,rg:35,cd:0.94,r:17},
+ mechgolem:{hp:424,sp:43,dm:47,rg:36,cd:0.98,r:17},
+ mechspecialist:{hp:372,sp:42,dm:50,rg:130,cd:1.02,r:18},
+ mechguardian:{hp:480,sp:40,dm:53,rg:39,cd:1.07,r:19},
+ mechcaller:{hp:428,sp:38,dm:56,rg:130,cd:1.11,r:20},
+ mechtitan:{hp:536,sp:37,dm:59,rg:42,cd:1.16,r:21},
+ mechdragon:{hp:484,sp:36,dm:63,rg:130,cd:1.21,r:21},
+ mechemperor:{hp:592,sp:34,dm:66,rg:45,cd:1.25,r:22}
+};
+const DR={ // Drake
+ drakesoldier:{hp:115,sp:64,dm:23,rg:25,cd:0.62,r:11},
+ drakearcher:{hp:143,sp:62,dm:26,rg:130,cd:0.67,r:12},
+ drakescout:{hp:171,sp:81,dm:29,rg:28,cd:0.71,r:13},
+ drakeguard:{hp:279,sp:60,dm:33,rg:29,cd:0.76,r:13},
+ drakemage:{hp:227,sp:58,dm:36,rg:130,cd:0.80,r:14},
+ drakerider:{hp:255,sp:76,dm:39,rg:32,cd:0.84,r:15},
+ drakebeast:{hp:283,sp:55,dm:42,rg:33,cd:0.89,r:16},
+ drakeknight:{hp:311,sp:54,dm:45,rg:35,cd:0.94,r:17},
+ drakegolem:{hp:419,sp:52,dm:49,rg:36,cd:0.98,r:17},
+ drakespecialist:{hp:367,sp:50,dm:52,rg:130,cd:1.02,r:18},
+ drakeguardian:{hp:475,sp:49,dm:55,rg:39,cd:1.07,r:19},
+ drakecaller:{hp:423,sp:48,dm:58,rg:130,cd:1.11,r:20},
+ draketitan:{hp:531,sp:46,dm:61,rg:42,cd:1.16,r:21},
+ drakedragon:{hp:479,sp:44,dm:65,rg:130,cd:1.21,r:21},
+ drakeemperor:{hp:587,sp:43,dm:68,rg:45,cd:1.25,r:22}
+};
+const CR={ // Crystal
+ crystalsoldier:{hp:130,sp:48,dm:20,rg:25,cd:0.62,r:11},
+ crystalarcher:{hp:158,sp:46,dm:23,rg:130,cd:0.67,r:12},
+ crystalscout:{hp:186,sp:65,dm:26,rg:28,cd:0.71,r:13},
+ crystalguard:{hp:294,sp:44,dm:30,rg:29,cd:0.76,r:13},
+ crystalmage:{hp:242,sp:42,dm:33,rg:130,cd:0.80,r:14},
+ crystalrider:{hp:270,sp:60,dm:36,rg:32,cd:0.84,r:15},
+ crystalbeast:{hp:298,sp:39,dm:39,rg:33,cd:0.89,r:16},
+ crystalknight:{hp:326,sp:38,dm:42,rg:35,cd:0.94,r:17},
+ crystalgolem:{hp:434,sp:36,dm:46,rg:36,cd:0.98,r:17},
+ crystalspecialist:{hp:382,sp:34,dm:49,rg:130,cd:1.02,r:18},
+ crystalguardian:{hp:490,sp:33,dm:52,rg:39,cd:1.07,r:19},
+ crystalcaller:{hp:438,sp:32,dm:55,rg:130,cd:1.11,r:20},
+ crystaltitan:{hp:546,sp:30,dm:58,rg:42,cd:1.16,r:21},
+ crystaldragon:{hp:494,sp:28,dm:62,rg:130,cd:1.21,r:21},
+ crystalemperor:{hp:602,sp:27,dm:65,rg:45,cd:1.25,r:22}
+};
+const MY={ // Spore
+ sporesoldier:{hp:105,sp:52,dm:19,rg:25,cd:0.62,r:11},
+ sporearcher:{hp:133,sp:50,dm:22,rg:130,cd:0.67,r:12},
+ sporescout:{hp:161,sp:69,dm:25,rg:28,cd:0.71,r:13},
+ sporeguard:{hp:269,sp:48,dm:29,rg:29,cd:0.76,r:13},
+ sporemage:{hp:217,sp:46,dm:32,rg:130,cd:0.80,r:14},
+ sporerider:{hp:245,sp:64,dm:35,rg:32,cd:0.84,r:15},
+ sporebeast:{hp:273,sp:43,dm:38,rg:33,cd:0.89,r:16},
+ sporeknight:{hp:301,sp:42,dm:41,rg:35,cd:0.94,r:17},
+ sporegolem:{hp:409,sp:40,dm:45,rg:36,cd:0.98,r:17},
+ sporespecialist:{hp:357,sp:38,dm:48,rg:130,cd:1.02,r:18},
+ sporeguardian:{hp:465,sp:37,dm:51,rg:39,cd:1.07,r:19},
+ sporecaller:{hp:413,sp:36,dm:54,rg:130,cd:1.11,r:20},
+ sporetitan:{hp:521,sp:34,dm:57,rg:42,cd:1.16,r:21},
+ sporedragon:{hp:469,sp:32,dm:61,rg:130,cd:1.21,r:21},
+ sporeemperor:{hp:577,sp:31,dm:64,rg:45,cd:1.25,r:22}
+};
+const AS={ // Astro
+ astrosoldier:{hp:110,sp:60,dm:21,rg:25,cd:0.62,r:11},
+ astroarcher:{hp:138,sp:58,dm:24,rg:130,cd:0.67,r:12},
+ astroscout:{hp:166,sp:77,dm:27,rg:28,cd:0.71,r:13},
+ astroguard:{hp:274,sp:56,dm:31,rg:29,cd:0.76,r:13},
+ astromage:{hp:222,sp:54,dm:34,rg:130,cd:0.80,r:14},
+ astrorider:{hp:250,sp:72,dm:37,rg:32,cd:0.84,r:15},
+ astrobeast:{hp:278,sp:51,dm:40,rg:33,cd:0.89,r:16},
+ astroknight:{hp:306,sp:50,dm:43,rg:35,cd:0.94,r:17},
+ astrogolem:{hp:414,sp:48,dm:47,rg:36,cd:0.98,r:17},
+ astrospecialist:{hp:362,sp:46,dm:50,rg:130,cd:1.02,r:18},
+ astroguardian:{hp:470,sp:45,dm:53,rg:39,cd:1.07,r:19},
+ astrocaller:{hp:418,sp:44,dm:56,rg:130,cd:1.11,r:20},
+ astrotitan:{hp:526,sp:42,dm:59,rg:42,cd:1.16,r:21},
+ astrodragon:{hp:474,sp:40,dm:63,rg:130,cd:1.21,r:21},
+ astroemperor:{hp:582,sp:39,dm:66,rg:45,cd:1.25,r:22}
+};
+const CIVDEFS={titan:P,volcanis:E,glacial:G,necromancer:N,tempest:T,verdantia:V,umbral:U,solaria:S,aqualis:A,dunara:DU,mechanicha:ME,dragonalis:DR,crystalia:CR,mycelia:MY,astralis:AS};
+let sel='warrior',units=[],shots=[],parts=[],pE=5,eE=5,pT=1400,eT=1400,time=480,run=false,end=false,count=0,ai=1,node=0,nodeOwner=null,last=0,recentEnemy=[];
+let ultimate=0,shieldTime=0,meteorCD=0,shieldCD=0,enemyPowerCD=7,enemyShieldTime=0,playerCiv='titan',selectedMap='titan',battleMode='casual',adminEnergy=false,rankedRating=1000,rankedWins=0,rankedLosses=0,battleStats={spawned:0,kills:0,towerDamage:0,unitsLost:0,powers:0,debrisCleared:0,start:480};let overdriveAnnounced=false,finalMinuteAnnounced=false,suddenDeath=false,suddenTime=45;
+let towerSys={p:{def:{hp:400,max:400},gen:{hp:350,max:350},core:{hp:650,max:650}},e:{def:{hp:400,max:400},gen:{hp:350,max:350},core:{hp:650,max:650}}},towerDefenseTimer={p:0,e:0};
+let debris=[],debrisSeq=0;
+
+let playerProfile={
+ name:'Player',avatar:'🛡️',xp:0,level:1,battles:0,wins:0,losses:0,bestStreak:0,
+ kills:0,towerDamage:0,units:0,medals:0,favorite:'titan',civUses:{},history:[],achievements:[]
+};
+
+function profileXpNeed(level){return 100+Math.max(0,level-1)*45}
+function loadProfile(){
+ try{
+   let p=JSON.parse(localStorage.getItem('towerClashProfile')||'null');
+   if(p)playerProfile=Object.assign(playerProfile,p);
+ }catch(e){}
+}
+function saveProfile(){try{localStorage.setItem('towerClashProfile',JSON.stringify(playerProfile))}catch(e){}}
+function profileAddXp(n){
+ playerProfile.xp+=Math.max(0,Math.round(n));
+ let need=profileXpNeed(playerProfile.level);
+ while(playerProfile.xp>=need){
+   playerProfile.xp-=need;playerProfile.level++;need=profileXpNeed(playerProfile.level);
+ }
+}
+function unlockAchievement(id,label){
+ if(!playerProfile.achievements.includes(id)){playerProfile.achievements.push(id);saveProfile();banner('🏅 '+label,900)}
+}
+function evaluateAchievements(){
+ if(playerProfile.battles>=1)unlockAchievement('first','FIRST BATTLE');
+ if(playerProfile.wins>=1)unlockAchievement('winner','FIRST VICTORY');
+ if(playerProfile.wins>=10)unlockAchievement('v10','10 VICTORIES');
+ if(playerProfile.wins>=50)unlockAchievement('v50','50 VICTORIES');
+ if(playerProfile.kills>=100)unlockAchievement('k100','100 KILLS');
+ if(playerProfile.towerDamage>=10000)unlockAchievement('d10k','TOWER BREAKER');
+ if(playerProfile.bestStreak>=5)unlockAchievement('s5','HOT STREAK');
+ if(rankedRating>=1500)unlockAchievement('master','MASTER RANK');
+ if(playerProfile.level>=10)unlockAchievement('lvl10','LEVEL 10');
+}
+const PROFILE_BADGES={
+ first:'⚔️ First Battle',winner:'🏆 First Victory',v10:'🥇 10 Victories',v50:'👑 50 Victories',
+ k100:'💀 100 Kills',d10k:'🏰 Tower Breaker',s5:'🔥 5 Win Streak',master:'💎 Master Rank',lvl10:'⭐ Level 10'
+};
+function updateProfileFavorite(){
+ let uses=playerProfile.civUses||{},keys=Object.keys(uses);
+ if(keys.length)playerProfile.favorite=keys.sort((a,b)=>(uses[b]||0)-(uses[a]||0))[0];
+}
+function recordProfileBattle(win,medalCount,elapsed){
+ playerProfile.battles++;if(win)playerProfile.wins++;else playerProfile.losses++;
+ playerProfile.bestStreak=Math.max(playerProfile.bestStreak,rankedStreak||0);
+ playerProfile.kills+=battleStats.kills||0;
+ playerProfile.towerDamage+=Math.round(battleStats.towerDamage||0);
+ playerProfile.units+=battleStats.spawned||0;
+ playerProfile.medals+=medalCount||0;
+ playerProfile.civUses[playerCiv]=(playerProfile.civUses[playerCiv]||0)+1;updateProfileFavorite();
+ profileAddXp(25+(win?35:12)+(battleStats.kills||0)*2+(medalCount||0)*10+(battleMode==='ranked'?15:0));
+ playerProfile.history.unshift({
+   result:win?'WIN':'LOSS',civ:playerCiv,map:selectedMap,mode:battleMode,
+   kills:battleStats.kills||0,time:Math.round(elapsed),date:new Date().toLocaleDateString()
+ });
+ playerProfile.history=playerProfile.history.slice(0,10);
+ evaluateAchievements();saveProfile();renderProfile();
+}
+function renderProfile(){
+ let p=playerProfile,need=profileXpNeed(p.level);
+ const q=id=>document.getElementById(id);
+ if(!q('profilePanel'))return;if(q('hudPlayerName'))q('hudPlayerName').textContent=(p.name||'Player').toUpperCase();
+ q('profileAvatar').textContent=p.avatar||'🛡️';
+ q('profileName').textContent=p.name||'Player';
+ q('profileRank').textContent=`${rankName(rankedRating)} • ${rankedRating} RP`;
+ q('profileLevel').textContent=p.level;
+ q('profileXpTxt').textContent=`${p.xp} / ${need} XP`;
+ q('profileXpBar').style.width=Math.max(0,Math.min(100,p.xp/need*100))+'%';
+ q('profileFav').textContent=(p.favorite||'titan').toUpperCase();
+ q('psWins').textContent=p.wins||0;q('psLosses').textContent=p.losses||0;q('psBattles').textContent=p.battles||0;
+ q('psStreak').textContent=p.bestStreak||0;q('psKills').textContent=p.kills||0;q('psDamage').textContent=Math.round(p.towerDamage||0);
+ q('psUnits').textContent=p.units||0;q('psMedals').textContent=p.medals||0;
+ q('profileNameInput').value=p.name||'Player';q('profileAvatarSelect').value=p.avatar||'🛡️';
+ q('profileBadges').innerHTML=(p.achievements||[]).map(id=>`<span class="badgeChip">${PROFILE_BADGES[id]||id}</span>`).join('')||'<span style="color:#7890a6;font-size:11px">No achievements yet</span>';
+ q('profileHistory').innerHTML=(p.history||[]).map(h=>`<div class="historyRow"><b>${h.result}</b><span>${(h.civ||'').toUpperCase()} • ${(h.map||'').toUpperCase()} • ${h.kills||0} K</span><span>${h.date||''}</span></div>`).join('')||'<div style="color:#7890a6;font-size:11px">No battles yet</div>';
+}
+loadProfile();
+
+
+// ================================================================
+// TOWER CLASH 2.x — cumulative 100-update enhancement layer
+// TC2_LEVEL is changed per generated version (1..100).
+// ================================================================
+const TC2_LEVEL=100;
+const TC2_FEATURES=["HUD critical-core warning", "HUD generator warning", "HUD defenses warning", "Energy high-state indicator", "Ultimate-ready indicator", "Lane-control indicator", "Overdrive HUD indicator", "Sudden-death HUD indicator", "Responsive battlefield guard", "iPad landscape preservation", "AI weak-module targeting", "AI anti-air response", "AI anti-tank response", "AI swarm response", "AI siege timing", "AI low-energy discipline", "AI high-energy finisher", "AI lane pressure memory", "AI ranked aggression scaling", "AI deployment variety", "Titan resilience+", "Volcanis burn+", "Glacial control+", "Necromancer sustain+", "Tempest speed+", "Verdantia regeneration+", "Umbral ambush+", "Solaria radiance+", "Aqualis slow+", "Dunara mobility+", "Tank mitigation", "Ranged spacing", "Support recovery", "Siege module damage", "Beast charge damage", "Air mobility", "Skirmisher execution", "Veteran scaling", "Elite scaling", "Formation diversity bonus", "Defense armor layer", "Generator energy consequence+", "Core exposure bonus", "Last-stand tuning", "Defense fire scaling", "Debris impact scaling", "Debris decay scaling", "Module destruction shockwave", "Critical-core instability", "Tower comeback safeguard", "Titan Valley fortitude", "Volcanic Rift heat", "Frozen Pass chill", "Ancient Forest renewal", "Desert Ruins mobility", "Iron Foundry armor", "Sunken Kingdom currents", "Astral Ruins warp", "Arena center-node bonus", "Arena overtime intensity", "Ranked AI tier scaling", "Ranked RP difficulty bonus", "Ranked streak bonus+", "Ranked loss protection", "Underdog RP bonus", "Fast-win RP bonus", "Low-loss RP bonus", "Module-dominance RP bonus", "Rank persistence guard", "Grandmaster pressure", "Offensive power cooldown tuning", "Offensive power lane pressure", "Shield duration tuning", "Shield troop protection", "Ultimate charge tuning", "Ultimate veteran inspiration", "Power visual burst+", "Power anti-swarm effect", "Power anti-core safeguard", "Power comeback charge", "Battle event framework", "Energy surge event", "Fog control event", "Meteor fragments event", "Repair pulse event", "Lane storm event", "Center-node event", "Debris tremor event", "Final-minute frenzy", "Event pacing guard", "Delta-time guard+", "Unit boundary clamp", "Unit-count safety", "Projectile-count safety", "Particle-count safety", "Debris-count safety", "HP clamp", "Cooldown clamp", "State integrity guard", "2.x final integration polish"];
+const tc2On=n=>TC2_LEVEL>=n;
+let tc2EventTimer=24,tc2EventIndex=0,tc2LastLane=[-1,-1,-1],tc2FramePulse=0;
+
+function tc2CivBuff(u,dt){
+ const civ=civOfUnit(u);
+ if(tc2On(21)&&civ==='titan'&&u.hp/u.max<.5)u.fortify=Math.max(u.fortify,.28);
+ if(tc2On(22)&&civ==='volcanis'&&u.burn<=0&&Math.random()<dt*.035)u.dm=Math.min(u.dm*1.004,u.baseDm*1.12);
+ if(tc2On(23)&&civ==='glacial'&&u.slow>0)u.fortify=Math.max(u.fortify,.12);
+ if(tc2On(24)&&civ==='necromancer'&&u.hp/u.max<.32)u.hp=Math.min(u.max,u.hp+u.max*.007*dt);
+ if(tc2On(25)&&civ==='tempest')u.walk+=dt*1.6;
+ if(tc2On(26)&&civ==='verdantia')u.hp=Math.min(u.max,u.hp+u.max*.0025*dt);
+ if(tc2On(27)&&civ==='umbral'&&u.hit<=0&&u.hp/u.max>.7)u.sp*=1.00002;
+ if(tc2On(28)&&civ==='solaria'&&u.hp/u.max>.8)u.fortify=Math.max(u.fortify,.08);
+ if(tc2On(29)&&civ==='aqualis'&&u.slow<=0&&Math.random()<dt*.03)u.ability=Math.min(u.ability,.25);
+ if(tc2On(30)&&civ==='dunara'&&unitRole(u.t)==='skirmisher')u.walk+=dt*1.4;
+}
+
+function tc2RoleAttackMult(u,target,tower){
+ let r=unitRole(u.t),m=1;
+ if(tc2On(31)&&r==='tank')m*=1.02;
+ if(tc2On(32)&&r==='ranged'&&!tower)m*=1.045;
+ if(tc2On(33)&&r==='support'&&!tower)m*=.98;
+ if(tc2On(34)&&r==='siege'&&tower)m*=1.14;
+ if(tc2On(35)&&r==='beast'&&!tower)m*=1.07;
+ if(tc2On(36)&&r==='air')m*=1.045;
+ if(tc2On(37)&&r==='skirmisher'&&target&&target.hp/target.max<.38)m*=1.16;
+ if(tc2On(38)&&u.veteran)m*=1.04;
+ if(tc2On(39)&&u.elite)m*=1.05;
+ if(tc2On(40)&&!units.some(q=>q!==u&&q.s===u.s&&q.l===u.l&&q.t===u.t&&q.hp>0))m*=1.035;
+ return m;
+}
+
+function tc2UnitTick(u,dt){
+ tc2CivBuff(u,dt);
+ let r=unitRole(u.t);
+ if(tc2On(31)&&r==='tank')u.fortify=Math.max(u.fortify,.06);
+ if(tc2On(32)&&r==='ranged'){let foe=units.find(q=>q.s!==u.s&&q.l===u.l&&q.hp>0&&Math.abs(q.x-u.x)<48);if(foe)u.x+=(u.s==='p'?-1:1)*u.sp*.08*dt}
+ if(tc2On(33)&&r==='support'&&u.hp<u.max)u.hp=Math.min(u.max,u.hp+u.max*.0015*dt);
+ if(tc2On(36)&&r==='air')u.slow=Math.max(0,u.slow-dt*.18);
+ if(tc2On(38)&&u.veteran)u.fortify=Math.max(u.fortify,.045);
+ if(tc2On(39)&&u.elite)u.fortify=Math.max(u.fortify,.075);
+ if(tc2On(92))u.x=Math.max(82,Math.min(W-82,u.x));
+ if(tc2On(97)){u.hp=Math.min(u.max,Math.max(-50,u.hp));}
+ if(tc2On(98)){u.a=Math.max(-1,Math.min(5,u.a));u.ability=Math.max(-1,Math.min(20,u.ability));}
+}
+
+function tc2TowerDamageMult(side,key,sourceSide){
+ let m=1;
+ if(tc2On(41)&&key==='core'&&towerSys[side].def.hp>0)m*=.94;
+ if(tc2On(43)&&key==='core'&&towerSys[side].def.hp<=0)m*=1.08;
+ if(tc2On(44)&&lastStand(side))m*=.94;
+ if(tc2On(50)&&((side==='p'?pT:eT)<520))m*=.97;
+ return m;
+}
+
+function tc2TowerTick(dt){
+ if(tc2On(45)){
+   for(const side of ['p','e'])if(towerSys[side].def.hp>0)towerDefenseTimer[side]-=dt*.06;
+ }
+ if(tc2On(49)){
+   for(const side of ['p','e']){
+     let q=towerSys[side].core;
+     if(q.hp>0&&q.hp/q.max<.22&&Math.random()<dt*.7)spark(tx(side),H*.53,'#ff5b4d',2);
+   }
+ }
+}
+
+function tc2ArenaTick(dt){
+ if(tc2On(51)&&selectedMap==='titan')units.filter(u=>u.hp>0).forEach(u=>u.fortify=Math.max(u.fortify,.025));
+ if(tc2On(52)&&selectedMap==='volcano'&&Math.random()<dt*.06){
+   let pool=units.filter(u=>u.hp>0);if(pool.length){let u=pool[Math.floor(Math.random()*pool.length)];u.burn=Math.max(u.burn,.7)}
+ }
+ if(tc2On(53)&&selectedMap==='frozen'&&Math.random()<dt*.05){
+   let pool=units.filter(u=>u.hp>0&&unitRole(u.t)!=='air');if(pool.length)pool[Math.floor(Math.random()*pool.length)].slow=Math.max(pool[Math.floor(Math.random()*pool.length)].slow||0,.45);
+ }
+ if(tc2On(54)&&selectedMap==='forest')units.filter(u=>u.hp>0).forEach(u=>u.hp=Math.min(u.max,u.hp+u.max*.00035*dt));
+ if(tc2On(55)&&selectedMap==='desert')units.filter(u=>u.hp>0&&unitRole(u.t)==='skirmisher').forEach(u=>u.walk+=dt*.35);
+ if(tc2On(56)&&selectedMap==='foundry')units.filter(u=>u.hp>0&&unitRole(u.t)==='tank').forEach(u=>u.fortify=Math.max(u.fortify,.035));
+ if(tc2On(57)&&selectedMap==='sunken')units.filter(u=>u.hp>0&&civOfUnit(u)==='aqualis').forEach(u=>u.slow=Math.max(0,u.slow-dt*.15));
+ if(tc2On(58)&&selectedMap==='astral'&&Math.random()<dt*.025){
+   let pool=units.filter(u=>u.hp>0);if(pool.length){let u=pool[Math.floor(Math.random()*pool.length)];u.x+=(u.s==='p'?1:-1)*8}
+ }
+ if(tc2On(59)&&nodeOwner){
+   units.filter(u=>u.s===nodeOwner&&Math.abs(u.x-W/2)<115&&u.hp>0).forEach(u=>u.fortify=Math.max(u.fortify,.045));
+ }
+ if(tc2On(60)&&time<=60)units.filter(u=>u.hp>0).forEach(u=>u.walk+=dt*.22);
+}
+
+function tc2AIWeight(k,d,lane,w){
+ if(tc2On(11)){let key=towerTargetForLane('p',lane),q=towerSys.p[key];if(q&&q.hp/q.max<.45)w*=1.18}
+ if(tc2On(12)&&units.some(u=>u.s==='p'&&u.l===lane&&unitRole(u.t)==='air')&&['ranged','air','support'].includes(unitRole(k)))w*=1.18;
+ if(tc2On(13)&&units.filter(u=>u.s==='p'&&u.l===lane&&unitRole(u.t)==='tank').length>=2&&unitRole(k)==='siege')w*=1.22;
+ if(tc2On(14)&&units.filter(u=>u.s==='p'&&u.l===lane).length>=4&&['support','ranged','siege'].includes(unitRole(k)))w*=1.16;
+ if(tc2On(15)&&eE>=7&&unitRole(k)==='siege')w*=1.17;
+ if(tc2On(16)&&eE<4&&(d.cost||4)<=3)w*=1.13;
+ if(tc2On(17)&&eE>=9&&(d.cost||4)>=8)w*=1.2;
+ if(tc2On(18)&&tc2LastLane[lane]>=0)w*=1.03;
+ if(tc2On(19)&&battleMode==='ranked')w*=rankedAILevel();
+ if(tc2On(20)&&recentEnemy.includes(k))w*=.78;
+ return w;
+}
+
+function tc2RankDelta(win,delta,elapsed){
+ if(!battleMode||battleMode!=='ranked')return delta;
+ if(tc2On(62)&&win)delta+=Math.round((rankedAILevel()-1)*8);
+ if(tc2On(63)&&win&&rankedStreak>=2)delta+=2;
+ if(tc2On(64)&&!win&&rankedRating<900)delta+=3;
+ if(tc2On(65)&&win&&rankedRating<900)delta+=2;
+ if(tc2On(66)&&win&&elapsed<270)delta+=2;
+ if(tc2On(67)&&win&&battleStats.unitsLost<=5)delta+=2;
+ if(tc2On(68)&&win&&towerSys.p.def.hp>0&&towerSys.p.gen.hp>0)delta+=2;
+ if(tc2On(70)&&rankedRating>=1800&&!win)delta-=2;
+ return delta;
+}
+
+function tc2PowerStart(kind){
+ if(kind==='meteor'){
+   if(tc2On(71))meteorCD=Math.max(8,meteorCD-1);
+   if(tc2On(72)){let lane=chooseAILane();units.filter(u=>u.s==='e'&&u.l===lane&&u.hp>0).forEach(u=>u.hit=.18)}
+   if(tc2On(78)){let foes=units.filter(u=>u.s==='e'&&u.hp>0);if(foes.length>=5)foes.forEach(u=>u.hp-=5)}
+   if(tc2On(79)&&towerSys.e.core.hp/towerSys.e.core.max<.15)damageTowerSystem('e','core',8,'p');
+ }
+ if(kind==='shield'){
+   if(tc2On(73))shieldTime+=.6;
+   if(tc2On(74))units.filter(u=>u.s==='p'&&u.hp>0).forEach(u=>u.fortify=Math.max(u.fortify,.4));
+ }
+ if(kind==='ultimate'){
+   if(tc2On(76))units.filter(u=>u.s==='p'&&u.hp>0).forEach(u=>{if(u.veteran)u.fortify=Math.max(u.fortify,.8)});
+   if(tc2On(77))spark(W/2,H*.48,'#ffffff',18);
+ }
+ if(tc2On(80)&&pT<eT-350)ultimate=Math.min(100,ultimate+4);
+}
+
+function tc2BattleEvent(dt){
+ if(!tc2On(81)||end||count>0)return;
+ tc2EventTimer-=dt;if(tc2EventTimer>0)return;
+ tc2EventIndex=(tc2EventIndex+1)%8;
+ let event=tc2EventIndex;
+ if(event===1&&tc2On(82)){pE=Math.min(10,pE+1.2);eE=Math.min(10,eE+1.2);banner('⚡ ENERGY SURGE',700)}
+ else if(event===2&&tc2On(83)){units.forEach(u=>u.slow=Math.max(u.slow,.35));banner('🌫️ FOG FRONT',700)}
+ else if(event===3&&tc2On(84)){let pool=units.filter(u=>u.hp>0);for(let i=0;i<Math.min(3,pool.length);i++){let u=pool[Math.floor(Math.random()*pool.length)];u.hp-=8;spark(u.x,u.y,'#ffb15c',6)}banner('☄️ FRAGMENTS',700)}
+ else if(event===4&&tc2On(85)){units.forEach(u=>u.hp=Math.min(u.max,u.hp+u.max*.035));banner('🔧 REPAIR PULSE',700)}
+ else if(event===5&&tc2On(86)){let l=Math.floor(Math.random()*3);units.filter(u=>u.l===l).forEach(u=>u.stun=Math.max(u.stun,.18));banner('🌩️ LANE STORM',700)}
+ else if(event===6&&tc2On(87)){node=Math.max(-1,Math.min(1,node+(nodeOwner==='p'?.14:nodeOwner==='e'?-.14:0)));banner('⚡ NODE CHARGE',700)}
+ else if(event===7&&tc2On(88)){debris.filter(d=>d.landed).forEach(d=>d.hp-=10);banner('🧱 TREMOR',700)}
+ if(tc2On(89)&&time<=60){pE=Math.min(10,pE+.5);eE=Math.min(10,eE+.5)}
+ tc2EventTimer=tc2On(90)?28+Math.random()*12:22+Math.random()*8;
+}
+
+function tc2Safety(dt){
+ if(tc2On(93)&&units.length>90)units=units.filter((u,i)=>i>=units.length-90||u.hp>u.max*.25);
+ if(tc2On(94)&&shots.length>120)shots=shots.slice(-120);
+ if(tc2On(95)&&parts.length>420)parts=parts.slice(-420);
+ if(tc2On(96)&&debris.length>40)debris=debris.slice(-40);
+ if(tc2On(97))for(const u of units){if(!Number.isFinite(u.hp))u.hp=1;if(!Number.isFinite(u.x))u.x=u.s==='p'?130:W-130}
+ if(tc2On(99)){pE=Math.max(0,Math.min(10,pE));eE=Math.max(0,Math.min(10,eE));ultimate=Math.max(0,Math.min(100,ultimate))}
+ if(tc2On(100)){tc2FramePulse=(tc2FramePulse+dt)%10;}
+}
+
+function tc2UI(){
+ if(!tc2On(1))return;
+ let el=document.getElementById('combatStatus');if(!el)return;
+ let warnings=[];
+ if(tc2On(1)&&(towerSys.p.core.hp/towerSys.p.core.max<.3))warnings.push('❤ CORE!');
+ if(tc2On(2)&&towerSys.p.gen.hp<=0)warnings.push('⚡ GEN DOWN');
+ if(tc2On(3)&&towerSys.p.def.hp<=0)warnings.push('🛡 DEF DOWN');
+ if(tc2On(4)&&pE>=8)warnings.push('⚡ HIGH ENERGY');
+ if(tc2On(5)&&ultimate>=100)warnings.push('👑 READY');
+ if(tc2On(6)){let c=[0,1,2].map(l=>laneControl(l)==='p'?'▲':laneControl(l)==='e'?'▼':'•').join('');warnings.push(c)}
+ if(tc2On(7)&&time<=180)warnings.push('OVERDRIVE');
+ if(tc2On(8)&&suddenDeath)warnings.push('SUDDEN');
+ if(warnings.length)el.textContent=(el.textContent+' • '+warnings.join(' ')).slice(0,110);
+}
+
+let laneOrders=['push','push','push'];
+function debrisLaneForModule(key){return key==='def'?0:key==='gen'?1:2}
+function spawnTowerDebris(side,key){let lane=debrisLaneForModule(key),baseX=tx(side)+(side==='p'?78:-78),targetX=tx(side)+(side==='p'?115:-115),count=key==='core'?8:key==='gen'?4:3;for(let i=0;i<count;i++){debris.push({id:++debrisSeq,side,key,lane,x:baseX+(Math.random()-.5)*30,y:H*.43-i*9,vx:(side==='p'?1:-1)*(45+Math.random()*65),vy:-35-Math.random()*70,rot:Math.random()*6.28,vr:(Math.random()-.5)*5,r:9+Math.random()*8,hp:key==='core'?170:110,landed:false,age:0,targetX:targetX+(Math.random()-.5)*42});}}
+function updateDebris(dt){for(const d of debris){d.age=(d.age||0)+dt;if(d.landed&&d.age>(tc2On(47)?20:24))d.hp-=(tc2On(47)?21:18)*dt;if(!d.landed){d.vy+=230*dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.rot+=d.vr*dt;let gy=ly(d.lane)+10;if(d.y>=gy){d.y=gy;d.x=d.targetX;d.landed=true;d.vx=d.vy=0;spark(d.x,d.y,'#b9a58b',12);
+for(const u of units){if(u.hp>0&&u.l===d.lane&&Math.abs(u.x-d.x)<38&&unitRole(u.t)!=='air'&&(META[u.t]||{}).kind!=='dragon'){u.hp-=tc2On(46)?15:12;u.hit=.16}}}}}debris=debris.filter(d=>d.hp>0)}
+function blockerFor(u){if((META[u.t]||{}).kind==='dragon'||unitRole(u.t)==='air')return null;let dir=u.s==='p'?1:-1,cands=debris.filter(d=>d.landed&&d.lane===u.l&&d.hp>0&&((d.x-u.x)*dir)>-8&&((d.x-u.x)*dir)<u.r+34);return cands.sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x))[0]||null}
+function hitDebris(u,d){d.hp-=Math.max(8,u.dm*.72);u.a=u.cd;spark(d.x,d.y,'#d2b48c',6);if(d.hp<=0){if(u.s==='p')battleStats.debrisCleared++;spark(d.x,d.y,'#e8d3b0',15);banner('DEBRIS CLEARED',500)}}
+function drawDebris(){for(const d of debris){x.save();x.translate(d.x,d.y);x.rotate(d.rot);x.fillStyle=d.key==='core'?'#4f3c3b':d.key==='gen'?'#665d35':'#555d66';x.strokeStyle='#c4b69a88';x.lineWidth=2;x.beginPath();x.moveTo(-d.r,-d.r*.55);x.lineTo(d.r*.7,-d.r);x.lineTo(d.r,d.r*.45);x.lineTo(-d.r*.6,d.r);x.closePath();x.fill();x.stroke();if(d.landed){x.fillStyle='#111a';x.fillRect(-16,d.r+3,32,3);x.fillStyle='#e6b85b';x.fillRect(-16,d.r+3,32*Math.max(0,d.hp/(d.key==='core'?170:110)),3)}x.restore()}}
+function resetTowerSystems(){towerSys={p:{def:{hp:400,max:400},gen:{hp:350,max:350},core:{hp:650,max:650}},e:{def:{hp:400,max:400},gen:{hp:350,max:350},core:{hp:650,max:650}}};towerDefenseTimer={p:0,e:0};syncTowerTotals()}
+function syncTowerTotals(){pT=['def','gen','core'].reduce((a,k)=>a+towerSys.p[k].hp,0);eT=['def','gen','core'].reduce((a,k)=>a+towerSys.e[k].hp,0)}
+function towerTargetForLane(side,lane){let wanted=['def','gen','core'][lane]||'core';if(towerSys[side][wanted].hp>0)return wanted;if(towerSys[side].core.hp>0)return 'core';if(towerSys[side].gen.hp>0)return 'gen';return 'def'}
+function damageTowerSystem(side,key,amount,sourceSide){let sys=towerSys[side][key];if(!sys||sys.hp<=0)return 0;let dmg=amount*tc2TowerDamageMult(side,key,sourceSide);if(side==='p'&&shieldTime>0)dmg*=.25;if(side==='e'&&enemyShieldTime>0)dmg*=.35;if(lastStand(side))dmg*=.82;if(key==='core'&&towerSys[side].def.hp>0)dmg*=.68;let before=sys.hp;sys.hp=Math.max(0,sys.hp-dmg);let dealt=before-sys.hp;syncTowerTotals();if(sourceSide==='p'){battleStats.towerDamage+=dealt;ultimate=Math.min(100,ultimate+2)}if(before>0&&sys.hp<=0){let names={def:'DEFENSES DESTROYED',gen:'GENERATOR DESTROYED',core:'CORE DESTROYED'};banner((side==='e'?'ENEMY ':'YOUR ')+names[key],1100);spark(tx(side),H*.53,key==='core'?'#ff3d3d':key==='gen'?'#ffe05d':'#ff8b55',28);spawnTowerDebris(side,key);
+if(key==='def')banner((side==='e'?'ENEMY ':'YOUR ')+'CORE EXPOSED',900);
+if(key==='gen')banner((side==='e'?'ENEMY ':'YOUR ')+'ENERGY CRIPPLED',900);
+if(key==='core'){spark(tx(side),H*.53,'#ff4038',42);
+ units.filter(u=>u.hp>0&&Math.abs(u.x-tx(side))<190).forEach(u=>{u.stun=Math.max(u.stun,tc2On(48)?.72:.55);u.hit=.16});
+}
+setTimeout(()=>{if(running){spawnTowerDebris(side,key);spark(tx(side)+(side==='p'?65:-65),ly(debrisLaneForModule(key)),'#9b8b78',18)}},220);
+}return dealt}
+function damageTowerByLane(side,lane,amount,sourceSide){return damageTowerSystem(side,towerTargetForLane(side,lane),amount,sourceSide)}
+function setTowerFraction(side,f){for(const k of ['def','gen','core'])towerSys[side][k].hp=towerSys[side][k].max*f;syncTowerTotals()}
+function lastStand(side){
+ let s=towerSys[side];return s.core.hp>0&&s.core.hp/s.core.max<.22&&s.def.hp<=0&&s.gen.hp<=0;
+}
+function towerModuleEffects(side){
+ const sys=towerSys[side];
+ return {
+   energy:sys.gen.hp>0?1:(tc2On(42)?.36:.42),
+   armor:sys.def.hp>0?.68:1,
+   defenseFire:sys.def.hp>0,
+   coreExposed:sys.def.hp<=0,
+   critical:sys.core.hp/sys.core.max<.3
+ };
+}
+function updateTowerDefenses(dt){for(const side of ['p','e']){towerDefenseTimer[side]-=dt;if(towerSys[side].def.hp<=0||towerDefenseTimer[side]>0)continue;let hostile=side==='p'?'e':'p',px=tx(side);let targets=units.filter(u=>u.s===hostile&&u.hp>0&&Math.abs(u.x-px)<235);if(!targets.length)continue;let q=targets.sort((a,b)=>Math.abs(a.x-px)-Math.abs(b.x-px))[0];let dmg=22;q.hp-=dmg;q.hit=.12;towerDefenseTimer[side]=1.35;spark(q.x,q.y,side==='p'?'#79e7ff':'#ff845e',7)}}
+function chooseCivButton(b){
+ if(!b)return;
+ playerCiv=b.dataset.civ;
+ document.querySelectorAll('.civ').forEach(q=>q.classList.toggle('selected',q===b));
+ updateRoster();
+}
+document.querySelectorAll('.civ').forEach(b=>{
+ b.addEventListener('pointerup',e=>{e.preventDefault();chooseCivButton(b)});
+ b.addEventListener('click',e=>{e.preventDefault();chooseCivButton(b)});
+});
+const titanRoster=[['warrior','⚔️','Titan Warrior',2],['stoneguard','🛡️','Stone Guard',3],['thrower','🪨','Boulder Thrower',3],['archer','🏹','Titan Archer',3],['crusher','💥','Earth Crusher',4],['colossus','🗿','Iron Colossus',5],['mountainguard','⛰️','Mountain Guard',4],['berserker','🪓','Titan Berserker',4],['mage','✨','Earth Mage',5],['siege','🎯','Siege Titan',6],['beast','🐗','Granite Beast',5],['commander','👑','Titan Commander',6],['giant','🗿','Mountain Giant',7],['worldbreaker','💢','Worldbreaker',8],['emperor','👑','Titan Emperor',10]];
+const volcRoster=[['lava','🔥','Lava Soldier',2],['magma','🌋','Magma Brute',3],['firearcher','🏹','Fire Archer',3],['ash','🗡️','Ash Assassin',3],['golem','🪨','Lava Golem',4],['flamemage','🔥','Flame Mage',4],['magmabeast','🐗','Magma Beast',5],['inferno','⚔️','Inferno Knight',5],['bomber','💣','Volcano Bomber',5],['drake','🐉','Fire Drake',6],['obsidian','🛡️','Obsidian Guardian',6],['eruption','💥','Eruption Beast',6],['magmatitan','🌋','Magma Titan',7],['dragon','🐉','Inferno Dragon',8],['volcemperor','👑','Volcanic Emperor',10]];
+
+const glacialRoster=[['frost','❄️','Frost Soldier',2],['icearcher','🏹','Ice Archer',3],['snowscout','🌨️','Snow Scout',2],['frozenguard','🛡️','Frozen Guard',3],['frostmage','✨','Frost Mage',4],['icewolf','🐺','Ice Wolf',3],['glacierwarrior','🪓','Glacier Warrior',4],['cryoknight','⚔️','Cryo Knight',5],['snowgolem','☃️','Snow Golem',5],['icewitch','🧙','Ice Witch',5],['frozenbeast','🐾','Frozen Beast',5],['glacierguardian','🛡️','Glacier Guardian',6],['frostgiant','🗿','Frost Giant',7],['yeti','👹','Ancient Yeti',8],['iceemperor','👑','Ice Emperor',10]];
+const necroRoster=[['skeleton','💀','Skeleton Soldier',2],['bonearcher','🏹','Bone Archer',2],['gravewalker','🪦','Grave Walker',2],['skeletonknight','⚔️','Skeleton Knight',3],['ghoul','🧟','Ghoul',3],['darkpriest','🔮','Dark Priest',4],['bonegolem','🦴','Bone Golem',5],['soulhunter','👻','Soul Hunter',4],['gravemage','✨','Grave Mage',5],['deathknight','🗡️','Death Knight',5],['corpsebeast','🧟','Corpse Beast',5],['soulreaper','☠️','Soul Reaper',6],['lich','🧙','Lich',7],['necrodragon','🐉','Necro Dragon',8],['deathemperor','👑','Death Emperor',10]];
+const tempestRoster=[['storm','⚡','Storm Soldier',2],['sparkarcher','🏹','Spark Archer',3],['lightningscout','💨','Lightning Scout',2],['thunderguard','🛡️','Thunder Guard',3],['voltmage','✨','Volt Mage',4],['stormwolf','🐺','Storm Wolf',3],['thunderknight','⚔️','Thunder Knight',4],['lightningassassin','🗡️','Lightning Assassin',4],['stormgolem','🤖','Storm Golem',5],['cyclonerider','🌪️','Cyclone Rider',5],['thunderbeast','🐾','Thunder Beast',5],['stormcaller','⚡','Storm Caller',6],['lightningtitan','🗿','Lightning Titan',7],['tempestdragon','🐉','Tempest Dragon',8],['stormemperor','👑','Storm Emperor',10]];
+
+const verdantiaRoster=[['vine','🌿','Vine Soldier',2],['thornarcher','🏹','Thorn Archer',3],['forestscout','🍃','Forest Scout',2],['rootguard','🛡️','Root Guard',3],['naturemage','✨','Nature Mage',4],['wolfrider','🐺','Wolf Rider',4],['vinebeast','🌱','Vine Beast',4],['treewarrior','🌳','Tree Warrior',5],['poisonflower','🌺','Poison Flower',4],['forestguardian','🛡️','Forest Guardian',6],['treant','🌲','Ancient Treant',7],['naturewitch','🧙','Nature Witch',6],['wildtitan','🗿','Wild Titan',8],['forestdragon','🐉','Forest Dragon',9],['verdantemperor','👑','Verdant Emperor',10]];
+const umbralRoster=[['shadow','🌑','Shadow Soldier',2],['darkarcher','🏹','Dark Archer',3],['nightscout','🌘','Night Scout',2],['shadowguard','🛡️','Shadow Guard',3],['voidassassin','🗡️','Void Assassin',4],['darkmage','✨','Dark Mage',4],['phantomwolf','🐺','Phantom Wolf',4],['shadowknight','⚔️','Shadow Knight',5],['nightstalker','👤','Night Stalker',5],['wraith','👻','Wraith',5],['darkbeast','🐾','Dark Beast',6],['shadowlord','🌑','Shadow Lord',7],['abyssknight','⚔️','Abyss Knight',7],['voiddragon','🐉','Void Dragon',9],['umbralemperor','👑','Umbral Emperor',10]];
+const solariaRoster=[['sunsoldier','☀️','Sun Soldier',2],['lightarcher','🏹','Light Archer',3],['solarscout','✨','Solar Scout',2],['radiantguard','🛡️','Radiant Guard',3],['sunmage','🔆','Sun Mage',4],['lightknight','⚔️','Light Knight',4],['solarbeast','🦁','Solar Beast',5],['radiantassassin','🗡️','Radiant Assassin',4],['sungolem','☀️','Sun Golem',6],['phoenixrider','🔥','Phoenix Rider',6],['solarguardian','🛡️','Solar Guardian',7],['lightpriest','✨','Light Priest',6],['solartitan','🗿','Solar Titan',8],['lightphoenix','🐦','Light Phoenix',9],['solaremperor','👑','Solar Emperor',10]];
+const aqualisRoster=[['tide','🌊','Tide Soldier',2],['waterarcher','🏹','Water Archer',3],['wavescout','💧','Wave Scout',2],['coralguard','🪸','Coral Guard',3],['watermage','✨','Water Mage',4],['sharkrider','🦈','Shark Rider',4],['tidebeast','🌊','Tide Beast',5],['seaknight','⚔️','Sea Knight',5],['watergolem','💧','Water Golem',6],['krakenspawn','🐙','Kraken Spawn',6],['oceanguardian','🛡️','Ocean Guardian',7],['stormserpent','🐍','Storm Serpent',7],['deepseatitan','🗿','Deep Sea Titan',8],['kraken','🐙','Ancient Kraken',9],['oceanemperor','👑','Ocean Emperor',10]];
+const dunaraRoster=[['sand','🏜️','Sand Soldier',2],['sandarcher','🏹','Sand Archer',3],['dunescout','💨','Dune Scout',2],['desertguard','🛡️','Desert Guard',3],['sandmage','✨','Sand Mage',4],['scorpionrider','🦂','Scorpion Rider',4],['sandbeast','🐾','Sand Beast',5],['desertassassin','🗡️','Desert Assassin',4],['sandgolem','🗿','Sand Golem',6],['dunerider','🐫','Dune Rider',6],['miragewarrior','🌫️','Mirage Warrior',6],['desertguardian','🛡️','Desert Guardian',7],['sandtitan','🗿','Sand Titan',8],['sphinx','🦁','Ancient Sphinx',9],['duneemperor','👑','Dune Emperor',10]];
+const mechanichaRoster=[['mechsoldier','⚔️','Gear Soldier',2],['mecharcher','🏹','Bolt Archer',3],['mechscout','💨','Clockwork Scout',2],['mechguard','🛡️','Iron Guard',3],['mechmage','✨','Tech Mage',4],['mechrider','🏇','Gear Rider',4],['mechbeast','🐾','Steel Beast',5],['mechknight','⚔️','Mech Knight',5],['mechgolem','🤖','War Golem',6],['mechspecialist','💥','Chief Engineer',6],['mechguardian','🛡️','Aegis Guardian',7],['mechcaller','🔮','Tesla Caller',7],['mechtitan','🗿','Machine Titan',8],['mechdragon','🐉','Sky Dreadnought',9],['mechemperor','👑','Prime Mechanist',10]];
+const dragonalisRoster=[['drakesoldier','⚔️','Dragon Soldier',2],['drakearcher','🏹','Flame Archer',3],['drakescout','💨','Wing Scout',2],['drakeguard','🛡️','Scale Guard',3],['drakemage','✨','Dragon Mage',4],['drakerider','🏇','Drake Rider',4],['drakebeast','🐾','Dragon Beast',5],['drakeknight','⚔️','Wyrm Knight',5],['drakegolem','🤖','Scale Golem',6],['drakespecialist','💥','Hydra',6],['drakeguardian','🛡️','Dragon Guardian',7],['drakecaller','🔮','Wyrm Caller',7],['draketitan','🗿','Elder Titan',8],['drakedragon','🐉','Ancient Dragon',9],['drakeemperor','👑','Dragon Emperor',10]];
+const crystaliaRoster=[['crystalsoldier','⚔️','Crystal Soldier',2],['crystalarcher','🏹','Prism Archer',3],['crystalscout','💨','Shard Scout',2],['crystalguard','🛡️','Crystal Guard',3],['crystalmage','✨','Prism Mage',4],['crystalrider','🏇','Gem Rider',4],['crystalbeast','🐾','Shard Beast',5],['crystalknight','⚔️','Crystal Knight',5],['crystalgolem','🤖','Crystal Golem',6],['crystalspecialist','💥','Mirror Sentinel',6],['crystalguardian','🛡️','Prism Guardian',7],['crystalcaller','🔮','Crystal Caller',7],['crystaltitan','🗿','Gem Titan',8],['crystaldragon','🐉','Prism Dragon',9],['crystalemperor','👑','Crystal Emperor',10]];
+const myceliaRoster=[['sporesoldier','⚔️','Spore Soldier',2],['sporearcher','🏹','Spore Archer',3],['sporescout','💨','Mushroom Scout',2],['sporeguard','🛡️','Mycelial Guard',3],['sporemage','✨','Spore Mage',4],['sporerider','🏇','Beetle Rider',4],['sporebeast','🐾','Fungal Beast',5],['sporeknight','⚔️','Mycelial Knight',5],['sporegolem','🤖','Fungal Golem',6],['sporespecialist','💥','Spore Brute',6],['sporeguardian','🛡️','Mycelial Guardian',7],['sporecaller','🔮','Spore Caller',7],['sporetitan','🗿','Fungal Titan',8],['sporedragon','🐉','Spore Dragon',9],['sporeemperor','👑','Mycelial Emperor',10]];
+const astralisRoster=[['astrosoldier','⚔️','Astral Soldier',2],['astroarcher','🏹','Star Archer',3],['astroscout','💨','Comet Scout',2],['astroguard','🛡️','Astral Guard',3],['astromage','✨','Void Mage',4],['astrorider','🏇','Star Rider',4],['astrobeast','🐾','Cosmic Beast',5],['astroknight','⚔️','Astral Knight',5],['astrogolem','🤖','Void Golem',6],['astrospecialist','💥','Warp Walker',6],['astroguardian','🛡️','Astral Guardian',7],['astrocaller','🔮','Star Caller',7],['astrotitan','🗿','Cosmic Titan',8],['astrodragon','🐉','Star Dragon',9],['astroemperor','👑','Astral Emperor',10]];
+
+
+const CIVROSTERS={titan:titanRoster,volcanis:volcRoster,glacial:glacialRoster,necromancer:necroRoster,tempest:tempestRoster,verdantia:verdantiaRoster,umbral:umbralRoster,solaria:solariaRoster,aqualis:aqualisRoster,dunara:dunaraRoster,mechanicha:mechanichaRoster,dragonalis:dragonalisRoster,crystalia:crystaliaRoster,mycelia:myceliaRoster,astralis:astralisRoster};
+// Copy each roster's Energy cost into the real gameplay unit definition.
+// This keeps the UI and deployment logic synchronized for every civilization.
+Object.entries(CIVROSTERS).forEach(([civ, roster])=>{
+  roster.forEach(row=>{
+    const key=row[0], cost=row[3];
+    if(CIVDEFS[civ] && CIVDEFS[civ][key]) CIVDEFS[civ][key].cost=cost;
+  });
+});
+// 1.6.4 balance pass: softly normalize all 225 units by energy cost while preserving identity.
+function balanceAllUnits(){
+ const roleHp={tank:1.22,melee:1,skirmisher:.82,ranged:.78,support:.8,siege:1.05,beast:1.08,air:.92};
+ const roleDmg={tank:.86,melee:1,skirmisher:1.05,ranged:.95,support:.88,siege:1.18,beast:1.05,air:1.02};
+ for(const civ of Object.keys(CIVDEFS)){
+   for(const [key,d] of Object.entries(CIVDEFS[civ])){
+     let cost=Math.max(2,Math.min(10,d.cost||4)),role=unitRole(key);
+     let targetHp=(72+cost*48)*(roleHp[role]||1);
+     let targetDmg=(14+cost*6.2)*(roleDmg[role]||1);
+     d.hp=Math.round(d.hp*.72+targetHp*.28);
+     d.dm=Math.round((d.dm*.72+targetDmg*.28)*10)/10;
+     d.sp=Math.max(18,Math.min(105,d.sp));
+     d.cd=Math.max(.42,Math.min(1.5,d.cd));
+     if(role==='ranged'||role==='support')d.rg=Math.max(d.rg,118);
+     if(role==='siege')d.rg=Math.max(d.rg,145);
+   }
+ }
+}
+balanceAllUnits();
+const playerDefs=()=>CIVDEFS[playerCiv];
+const enemyCiv=()=>({titan:'volcanis',volcanis:'glacial',glacial:'necromancer',necromancer:'tempest',tempest:'verdantia',verdantia:'umbral',umbral:'solaria',solaria:'aqualis',aqualis:'dunara',dunara:'mechanicha',mechanicha:'dragonalis',dragonalis:'crystalia',crystalia:'mycelia',mycelia:'astralis',astralis:'titan'})[playerCiv];
+const enemyDefs=()=>CIVDEFS[enemyCiv()];
+
+
+function updateRoster(){let roster=CIVROSTERS[playerCiv],box=document.getElementById('buttons');box.innerHTML=roster.map((r,i)=>`<button type="button" class="unitBtn ${i===0?'sel':''}" data-u="${r[0]}"><b>${r[1]}</b>${r[2]}<small>⚡ ${r[3]}</small></button>`).join('');sel=roster[0][0];bindRoster();updatePowers()}
+function selectTroopButton(b){
+ if(!b||b.disabled)return;
+ sel=b.dataset.u;
+ document.querySelectorAll('.unitBtn').forEach(q=>q.classList.toggle('sel',q===b));
+}
+function bindRoster(){
+ document.querySelectorAll('.unitBtn').forEach(b=>{
+   b.addEventListener('pointerup',e=>{e.preventDefault();selectTroopButton(b)});
+   b.addEventListener('click',e=>{e.preventDefault();selectTroopButton(b)});
+ });
+}
+const POWER={
+titan:['🪨 ROCKFALL','🛡️ STONE SHIELD','👑 TITAN QUAKE'],
+volcanis:['☄️ METEOR','🔥 FLAME SHIELD','🌋 ERUPTION'],
+glacial:['❄️ BLIZZARD','🧊 ICE BARRIER','🥶 ABSOLUTE ZERO'],
+necromancer:['💀 SOUL BLAST','👻 SOUL WARD','☠️ ARMY OF DEAD'],
+tempest:['⚡ THUNDERBOLT','🌪️ WIND SHIELD','⛈️ PERFECT STORM'],
+verdantia:['🌿 VINE SURGE','💚 NATURE WARD','🌳 AWAKEN FOREST'],
+umbral:['🌑 VOID STRIKE','👻 SHADOW VEIL','🕳️ ETERNAL NIGHT'],
+solaria:['☀️ SOLAR FLARE','✨ RADIANT WARD','🔥 PHOENIX ASCENSION'],
+aqualis:['🌊 TIDAL WAVE','💧 OCEAN WARD','🐙 KRAKEN RISE'],
+dunara:['🏜️ SANDSTORM','🌫️ MIRAGE SHIELD','🦁 SPHINX WRATH'],
+mechanicha:['🔩 OVERCLOCK','⚙️ REPAIR FIELD','🤖 MACHINE ASCENSION'], dragonalis:['🔥 DRAGON BREATH','🛡️ SCALE WARD','🐉 DRAGONFURY'], crystalia:['💎 SHARD STORM','🔷 PRISM BARRIER','✨ CRYSTAL NOVA'], mycelia:['🍄 SPORE CLOUD','🌱 MYCELIAL WARD','☣️ GREAT BLOOM'], astralis:['☄️ STARFALL','🌌 WARP SHIELD','🪐 COSMIC RIFT']
+};
+function updatePowers(){let q=POWER[playerCiv];document.getElementById('meteor').textContent=q[0];document.getElementById('shield').textContent=q[1];document.getElementById('ultimate').textContent=q[2]+' 0%'}
+
+const ly=i=>H*lanes[i], tx=s=>s==='p'?78:W-78;
+function reset(){units=[];shots=[];parts=[];debris=[];debrisSeq=0;pE=eE=5;resetTowerSystems();time=480;end=false;count=3.2;ai=.9;node=0;nodeOwner=null;recentEnemy=[];ultimate=0;battleStats={spawned:0,kills:0,towerDamage:0,unitsLost:0,powers:0,debrisCleared:0,start:480};overdriveAnnounced=false;finalMinuteAnnounced=false;suddenDeath=false;suddenTime=45;laneOrders=['push','push','push'];document.getElementById('result').classList.remove('show');shieldTime=0;enemyShieldTime=0;enemyPowerCD=6+Math.random()*3;meteorCD=0;shieldCD=0;again.style.display='none';msg.textContent='3'}
+function banner(text,ms=850){
+ const b=document.getElementById('battleBanner');b.textContent=text;b.classList.add('show');
+ setTimeout(()=>b.classList.remove('show'),ms);
+}
+function rankName(r){return r>=1800?'GRANDMASTER':r>=1550?'MASTER':r>=1350?'DIAMOND':r>=1150?'PLATINUM':r>=950?'GOLD':r>=750?'SILVER':'BRONZE'}
+function loadRank(){try{let q=JSON.parse(localStorage.getItem('towerClashRank')||'null');if(q){rankedRating=q.r||1000;rankedWins=q.w||0;rankedLosses=q.l||0;rankedStreak=q.s||0}}catch(e){}}
+function saveRank(){if(tc2On(69))rankedRating=Math.max(0,Math.min(9999,rankedRating));try{localStorage.setItem('towerClashRank',JSON.stringify({r:rankedRating,w:rankedWins,l:rankedLosses,s:rankedStreak}))}catch(e){}}
+function rankedAILevel(){return Math.max(.82,Math.min(1.35,.9+(rankedRating-750)/2200))}
+loadRank();
+function updateRankInfo(){let el=document.getElementById('rankInfo');if(!el)return;if(battleMode==='ranked'){el.textContent=`🏆 ${rankName(rankedRating)} • ${rankedRating} RP • ${rankedWins}W/${rankedLosses}L`;modeSelect&&modeSelect.classList.add('rankedActive')}else{el.textContent='UNRANKED • Casual battle';modeSelect&&modeSelect.classList.remove('rankedActive')}}
+function showResult(win){
+ const r=document.getElementById('result');
+ document.getElementById('resultIcon').textContent=win?'🏆':'💥';
+ document.getElementById('resultTitle').textContent=win?'VICTORY!':'DEFEAT';
+ let rankLine='';
+ if(battleMode==='ranked'){
+   let level=rankedAILevel(),delta=win?Math.round(22+10*level):-Math.round(16+7*level);delta=tc2RankDelta(win,delta,Math.max(0,480-time));
+   if(win){rankedWins++;rankedStreak++;if(rankedStreak>=3)delta+=Math.min(8,rankedStreak*2)}else{rankedLosses++;rankedStreak=0}
+   rankedRating=Math.max(0,rankedRating+delta);saveRank();
+   rankLine=`<br>Rank: <b>${rankName(rankedRating)} ${rankedRating} RP</b> (${delta>0?'+':''}${delta})`;updateRankInfo();
+ }
+ let elapsed=Math.max(0,480-time),m=Math.floor(elapsed/60),sec=Math.floor(elapsed%60).toString().padStart(2,'0');
+ let medals=[];if(battleStats.kills>=12)medals.push('⚔️ SLAYER');if(battleStats.unitsLost<=4)medals.push('🛡️ SURVIVOR');if(battleStats.debrisCleared>=2)medals.push('🧱 BREAKER');if(elapsed<=240)medals.push('⚡ BLITZ');
+ let medalLine=medals.length?'<br>Medals: <b>'+medals.join(' • ')+'</b>':'';
+ recordProfileBattle(win,medals.length,elapsed);
+ document.getElementById('resultStats').innerHTML=`Mode: <b>${battleMode.toUpperCase()}</b><br>Map: <b>${selectedMap.toUpperCase()}</b><br>Civilization: <b>${playerCiv.toUpperCase()}</b> • Mechanic: <b>${(CIVMECH[playerCiv]||'TACTICS')}</b><br>Battle time: <b>${m}:${sec}</b><br>Units deployed: <b>${battleStats.spawned}</b><br>Kills: <b>${battleStats.kills}</b> • Lost: <b>${battleStats.unitsLost}</b><br>Tower damage: <b>${Math.round(battleStats.towerDamage)}</b><br>Powers used: <b>${battleStats.powers}</b> • Debris cleared: <b>${battleStats.debrisCleared}</b><br>Orders: <b>${laneOrders.map((o,i)=>['T','M','B'][i]+':'+o.toUpperCase()).join(' • ')}</b>${medalLine}${rankLine}`;
+ r.classList.add('show');
+}
+
+
+
+const lobby=document.getElementById('lobby'),lobbyCiv=document.getElementById('lobbyCiv'),lobbyMap=document.getElementById('lobbyMap'),modePicker=document.getElementById('modePicker');
+let lobbyMode='casual';
+const lobbyCivs=[
+ ['titan','Titan','🗿'],['volcanis','Volcanis','🔥'],['glacial','Glacial','❄️'],['necromancer','Necromancer','💀'],['tempest','Tempest','⚡'],
+ ['verdantia','Verdantia','🌿'],['umbral','Umbral','🌑'],['solaria','Solaria','☀️'],['aqualis','Aqualis','🌊'],['dunara','Dunara','🏜️'],
+ ['mechanicha','Mechanicha','⚙️'],['dragonalis','Dragonalis','🐉'],['crystalia','Crystalia','💎'],['mycelia','Mycelia','🍄'],['astralis','Astralis','🌌']
+];
+const lobbyMaps=[['titan','Titan Valley'],['volcano','Volcanic Rift'],['frozen','Frozen Pass'],['forest','Ancient Forest'],['desert','Desert Ruins'],['foundry','Iron Foundry'],['sunken','Sunken Kingdom'],['astral','Astral Ruins']];
+lobbyCiv.innerHTML=lobbyCivs.map(c=>`<option value="${c[0]}">${c[2]} ${c[1]}</option>`).join('');
+lobbyMap.innerHTML=lobbyMaps.map(m=>`<option value="${m[0]}">${m[1]}</option>`).join('');
+function nextRankText(r){
+ const steps=[[1200,'SILVER'],[1400,'GOLD'],[1600,'PLATINUM'],[1800,'DIAMOND'],[2000,'MASTER'],[2300,'GRANDMASTER']];
+ let n=steps.find(x=>r<x[0]);return n?`${n[0]-r} RP to ${n[1]}`:'TOP LEAGUE';
+}
+function renderLobby(){
+ let fav=playerProfile.favorite||'titan',c=lobbyCivs.find(x=>x[0]===fav)||lobbyCivs[0],need=profileXpNeed(playerProfile.level||1);
+ document.getElementById('lobbyAvatar').textContent=playerProfile.avatar||'🛡️';
+ document.getElementById('lobbyName').textContent=playerProfile.name||'Player';
+ document.getElementById('homeLevel').textContent=playerProfile.level||1;
+ document.getElementById('homeRecord').textContent=`${playerProfile.wins||0}W / ${playerProfile.losses||0}L`;
+ document.getElementById('homeLeague').textContent=rankName(rankedRating).toUpperCase();
+ document.getElementById('homeRP').textContent=rankedRating;
+ document.getElementById('rankPath').textContent=nextRankText(rankedRating);
+ document.getElementById('rankSideText').textContent=`${rankName(rankedRating)} • ${rankedRating} RP`;
+ document.getElementById('homeCivIcon').textContent=c[2];document.getElementById('homeCivName').textContent=c[1].toUpperCase();
+ document.getElementById('homeCivTrait').textContent=((typeof CIVMECH!=='undefined'&&CIVMECH[fav])||'TACTICS')+' • SELECTED CIVILIZATION';
+ document.getElementById('homeXpText').textContent=`${playerProfile.xp||0}/${need}`;
+ document.getElementById('homeXpBar').style.width=Math.min(100,(playerProfile.xp||0)/need*100)+'%';
+ lobbyCiv.value=fav;
+}
+function selectLobbyMode(m){
+ lobbyMode=m;document.querySelectorAll('.pickerMode').forEach(q=>q.classList.toggle('selected',q.dataset.lmode===m));
+ let names={casual:['⚔️ CASUAL','Standard battle'],ranked:['🏆 RANKED',`${rankName(rankedRating)} • ${rankedRating} RP`],training:['🎯 TRAINING','Practice battle']};
+ document.getElementById('homeModeName').textContent=names[m][0];document.getElementById('homeModeSub').textContent=names[m][1];
+}
+document.querySelectorAll('.pickerMode').forEach(b=>b.addEventListener('click',()=>selectLobbyMode(b.dataset.lmode)));
+document.getElementById('homePlay').addEventListener('click',()=>modePicker.classList.add('show'));
+document.getElementById('homeRanked').addEventListener('click',()=>{selectLobbyMode('ranked');modePicker.classList.add('show')});
+document.getElementById('homeProfile').addEventListener('click',()=>{renderProfile();profilePanel.classList.add('show')});
+document.getElementById('homeAchievements').addEventListener('click',()=>{renderProfile();profilePanel.classList.add('show')});
+document.getElementById('homeCivs').addEventListener('click',()=>{modePicker.classList.add('show');lobbyCiv.focus()});
+document.getElementById('homeUnits').addEventListener('click',()=>{modePicker.classList.add('show')});
+document.getElementById('homeSettings').addEventListener('click',()=>{banner('SETTINGS • EN / FR',700)});
+lobbyCiv.addEventListener('change',()=>{let c=lobbyCivs.find(x=>x[0]===lobbyCiv.value);if(c){document.getElementById('homeCivIcon').textContent=c[2];document.getElementById('homeCivName').textContent=c[1].toUpperCase();document.getElementById('homeCivTrait').textContent=((typeof CIVMECH!=='undefined'&&CIVMECH[c[0]])||'TACTICS')+' • READY'}});
+document.getElementById('pickerFight').addEventListener('click',()=>{
+ playerCiv=lobbyCiv.value;selectedMap=lobbyMap.value;battleMode=lobbyMode==='ranked'?'ranked':'casual';
+ const civButton=document.querySelector(`.civ[data-civ="${playerCiv}"]`);if(civButton)chooseCivButton(civButton);
+ if(mapSelect)mapSelect.value=selectedMap;if(modeSelect)modeSelect.value=battleMode;
+ updateRankInfo();modePicker.classList.remove('show');lobby.classList.add('hidden');go();
+});
+setTimeout(()=>{try{renderLobby()}catch(e){console.error('Lobby init:',e)}},0);
+const profileBtn=document.getElementById('profileBtn'),profilePanel=document.getElementById('profilePanel');
+profileBtn.addEventListener('click',()=>{renderProfile();profilePanel.classList.add('show')});
+document.getElementById('profileClose').addEventListener('click',()=>profilePanel.classList.remove('show'));
+document.getElementById('profileSave').addEventListener('click',()=>{
+ playerProfile.name=(document.getElementById('profileNameInput').value||'Player').trim().slice(0,18)||'Player';
+ playerProfile.avatar=document.getElementById('profileAvatarSelect').value||'🛡️';
+ saveProfile();renderProfile();banner('PROFILE SAVED',600);
+});
+function go(){reset();start.style.display='none';run=true;last=performance.now();requestAnimationFrame(loop)}
+const playBtn=document.getElementById('play');
+playBtn.addEventListener('pointerup',e=>{e.preventDefault();go()});
+playBtn.addEventListener('click',e=>{e.preventDefault();if(!run)go()});
+
+
+again.addEventListener('click',e=>{e.preventDefault();document.getElementById('result').classList.remove('show');again.style.display='none';start.style.display='none';lobby.classList.remove('hidden');renderLobby()});
+function duplicatePenalty(s,t,l){
+ let n=units.filter(u=>u.s===s&&u.t===t&&u.l===l&&u.hp>0).length;
+ return Math.max(.76,1-n*.06);
+}
+function spawn(s,t,l){l=Math.max(0,Math.min(2,l|0));let d=(s==='p'?playerDefs():enemyDefs())[t];if(!d){console.error('Cannot spawn troop:',s,t);return false;}if(s==='p')battleStats.spawned++;units.push({s,t,l,x:s==='p'?130:W-130,y:ly(l),hp:d.hp,max:d.hp,sp:d.sp,dm:d.dm,baseDm:d.dm,rg:d.rg,cd:d.cd,a:0,r:d.r,walk:Math.random()*6,hit:0,slow:0,burn:0,stun:0,fortify:0,revived:false,ability:0,air:unitRole(t)==='air',support:unitRole(t)==='support',kills:0,veteran:false,elite:false,formation:duplicatePenalty(s,t,l)});spark(s==='p'?130:W-130,ly(l),s==='p'?'#73e8ff':'#ff7047',10);return true}
+function castMeteor(){
+ battleStats.powers++;
+ if(!run||end||count>0||meteorCD>0)return;
+ meteorCD=12;tc2PowerStart('meteor');let victims=units.filter(u=>u.s==='e');
+ if(playerCiv==='glacial'){
+   victims.forEach(u=>{u.hp-=40;u.slow=Math.max(u.slow,4);if(Math.random()<.35)u.stun=Math.max(u.stun,.8);spark(u.x,u.y,'#8eeaff',12)});
+   damageTowerSystem('e','core',40,'p');
+ }else if(playerCiv==='necromancer'){
+   victims.forEach(u=>{u.hp-=65;spark(u.x,u.y,'#bd7cff',12)});
+   // summon two skeletons
+   spawn('p','skeleton',Math.floor(Math.random()*3));spawn('p','skeleton',Math.floor(Math.random()*3));
+   damageTowerSystem('e','core',65,'p');
+ }else if(playerCiv==='tempest'){
+   victims.forEach((u,i)=>{u.hp-=58;if(i<5)u.stun=Math.max(u.stun,.7);spark(u.x,u.y,'#ffe766',12)});
+   damageTowerSystem('e','core',60,'p');
+ }else if(playerCiv==='verdantia'){
+   victims.forEach(u=>{u.hp-=52;u.slow=Math.max(u.slow,1.4);spark(u.x,u.y,'#74e889',10)});units.filter(u=>u.s==='p').forEach(u=>u.hp=Math.min(u.max,u.hp+u.max*.08));damageTowerSystem('e','core',45,'p');
+ }else if(playerCiv==='umbral'){
+   victims.forEach(u=>{u.hp-=72;if(Math.random()<.35)u.stun=Math.max(u.stun,.45);spark(u.x,u.y,'#9b67ff',10)});damageTowerSystem('e','core',70,'p');
+ }else if(playerCiv==='solaria'){
+   victims.forEach(u=>{u.hp-=68;spark(u.x,u.y,'#ffe56b',12)});damageTowerSystem('e','core',75,'p');
+ }else if(playerCiv==='aqualis'){
+   victims.forEach(u=>{u.hp-=48;u.slow=Math.max(u.slow,3.5);spark(u.x,u.y,'#64dfff',12)});damageTowerSystem('e','core',50,'p');
+ }else if(playerCiv==='dunara'){
+   victims.forEach(u=>{u.hp-=60;u.stun=Math.max(u.stun,.3);spark(u.x,u.y,'#e8c47a',10)});damageTowerSystem('e','core',60,'p');
+ }else if(['mechanicha','dragonalis','crystalia','mycelia','astralis'].includes(playerCiv)){
+   let dmg={mechanicha:62,dragonalis:82,crystalia:58,mycelia:52,astralis:68}[playerCiv], col={mechanicha:'#ffb84d',dragonalis:'#ff684f',crystalia:'#bfa8ff',mycelia:'#ef9cff',astralis:'#8fe7ff'}[playerCiv];
+   victims.forEach(u=>{u.hp-=dmg;if(playerCiv==='dragonalis')u.burn=Math.max(u.burn,3);if(playerCiv==='mycelia')u.slow=Math.max(u.slow,2);if(playerCiv==='astralis')u.stun=Math.max(u.stun,.35);spark(u.x,u.y,col,12)});damageTowerSystem('e','core',dmg,'p');
+ }else{
+   let dmg={titan:62,volcanis:78}[playerCiv],col={titan:'#c6d0d8',volcanis:'#ff7a38'}[playerCiv];
+   victims.forEach(u=>{u.hp-=dmg;if(playerCiv==='volcanis')u.burn=Math.max(u.burn,3);spark(u.x,u.y,col,12)});
+   damageTowerSystem('e','core',({titan:65,volcanis:90}[playerCiv]),'p');
+ }
+}function castShield(){
+ battleStats.powers++;
+ if(!run||end||count>0||shieldCD>0)return;
+ tc2PowerStart('shield');shieldTime={titan:7,volcanis:5.5,glacial:7.5,necromancer:6.5,tempest:5.5,verdantia:6.5,umbral:5.5,solaria:7,aqualis:6.5,dunara:5.5,mechanicha:7,dragonalis:5.5,crystalia:7.5,mycelia:6.5,astralis:6}[playerCiv];shieldCD=18;
+ spark(tx('p'),H*.53,({titan:'#72eaff',volcanis:'#ff7045',glacial:'#8eeaff',necromancer:'#bd7cff',tempest:'#ffe76b',verdantia:'#78ef8c',umbral:'#9b67ff',solaria:'#ffe56b',aqualis:'#64dfff',dunara:'#e8c47a',mechanicha:'#ffb84d',dragonalis:'#ff684f',crystalia:'#bfa8ff',mycelia:'#ef9cff',astralis:'#8fe7ff'}[playerCiv]),20);
+ if(playerCiv==='titan')units.filter(u=>u.s==='p').forEach(u=>u.fortify=Math.max(u.fortify,5));
+ if(playerCiv==='glacial')units.filter(u=>u.s==='p').forEach(u=>u.fortify=Math.max(u.fortify,4));
+ if(playerCiv==='necromancer')units.filter(u=>u.s==='p').forEach(u=>u.hp=Math.min(u.max,u.hp+u.max*.18));
+ if(playerCiv==='tempest')units.filter(u=>u.s==='p').forEach(u=>u.sp*=1.04);
+}function castUltimate(){
+ battleStats.powers++;
+ if(!run||end||ultimate<100)return;
+ ultimate=0;tc2PowerStart('ultimate');
+ let foes=units.filter(u=>u.s==='e');
+ if(playerCiv==='titan'){
+   foes.forEach(u=>{u.hp-=130;u.stun=Math.max(u.stun,1.2);spark(u.x,u.y,'#ffd75a',16)});damageTowerSystem('e','core',180,'p');
+ }else if(playerCiv==='volcanis'){
+   foes.forEach(u=>{u.hp-=150;u.burn=Math.max(u.burn,4);spark(u.x,u.y,'#ff6238',16)});damageTowerSystem('e','core',210,'p');
+ }else if(playerCiv==='glacial'){
+   foes.forEach(u=>{u.hp-=105;u.slow=Math.max(u.slow,6);u.stun=Math.max(u.stun,1.5);spark(u.x,u.y,'#8eeaff',16)});damageTowerSystem('e','core',145,'p');
+ }else if(playerCiv==='necromancer'){
+   foes.forEach(u=>{u.hp-=125;spark(u.x,u.y,'#c07cff',16)});
+   for(let i=0;i<5;i++)spawn('p','skeleton',i%3);
+   damageTowerSystem('e','core',175,'p');
+ }else if(playerCiv==='verdantia'){
+   foes.forEach(u=>{u.hp-=95;u.slow=Math.max(u.slow,2);spark(u.x,u.y,'#78ef8c',14)});
+   units.filter(u=>u.s==='p').forEach(u=>u.hp=Math.min(u.max,u.hp+u.max*.22));damageTowerSystem('e','core',125,'p');
+ }else if(playerCiv==='umbral'){
+   foes.forEach(u=>{u.hp-=135;u.stun=Math.max(u.stun,.7);spark(u.x,u.y,'#9b67ff',15)});damageTowerSystem('e','core',180,'p');
+ }else if(playerCiv==='solaria'){
+   foes.forEach(u=>{u.hp-=128;spark(u.x,u.y,'#ffe56b',16)});
+   units.filter(u=>u.s==='p').forEach(u=>u.fortify=Math.max(u.fortify,4));damageTowerSystem('e','core',185,'p');
+ }else if(playerCiv==='aqualis'){
+   foes.forEach(u=>{u.hp-=100;u.slow=Math.max(u.slow,6);u.stun=Math.max(u.stun,.6);spark(u.x,u.y,'#64dfff',16)});damageTowerSystem('e','core',145,'p');
+ }else if(playerCiv==='dunara'){
+   foes.forEach(u=>{u.hp-=120;u.stun=Math.max(u.stun,.5);spark(u.x,u.y,'#e8c47a',15)});damageTowerSystem('e','core',165,'p');
+ }else if(playerCiv==='mechanicha'){ foes.forEach(u=>{u.hp-=115;u.stun=Math.max(u.stun,.7)});units.filter(u=>u.s==='p').forEach(u=>u.fortify=Math.max(u.fortify,5));damageTowerSystem('e','core',150,'p');
+ }else if(playerCiv==='dragonalis'){ foes.forEach(u=>{u.hp-=155;u.burn=Math.max(u.burn,4)});damageTowerSystem('e','core',205,'p');
+ }else if(playerCiv==='crystalia'){ foes.forEach(u=>{u.hp-=120;u.stun=Math.max(u.stun,.5)});units.filter(u=>u.s==='p').forEach(u=>u.fortify=Math.max(u.fortify,5));damageTowerSystem('e','core',160,'p');
+ }else if(playerCiv==='mycelia'){ foes.forEach(u=>{u.hp-=105;u.slow=Math.max(u.slow,5)});for(let i=0;i<3;i++)spawn('p','sporesoldier',i);damageTowerSystem('e','core',140,'p');
+ }else if(playerCiv==='astralis'){ foes.forEach(u=>{u.hp-=135;u.stun=Math.max(u.stun,.9)});damageTowerSystem('e','core',175,'p');
+ }else if(playerCiv==='tempest'){
+   foes.forEach(u=>{u.hp-=120;u.stun=Math.max(u.stun,1);spark(u.x,u.y,'#ffe65c',16)});damageTowerSystem('e','core',165,'p');
+ }
+ msg.textContent=POWER[playerCiv][2]+'!';setTimeout(()=>{if(!end)msg.textContent=''},700);
+}
+[['meteor',castMeteor],['shield',castShield],['ultimate',castUltimate]].forEach(([id,fn])=>{
+ const b=document.getElementById(id);let lock=false;
+ b.addEventListener('pointerup',e=>{e.preventDefault();lock=true;fn();setTimeout(()=>lock=false,250)});
+ b.addEventListener('click',e=>{e.preventDefault();if(!lock)fn()});
+});
+function cycleLaneOrder(l){
+ const seq=['push','hold','rush'];let i=seq.indexOf(laneOrders[l]);laneOrders[l]=seq[(i+1)%seq.length];
+ banner(['TOP','MID','BOT'][l]+' '+laneOrders[l].toUpperCase(),550);
+}
+c.addEventListener('dblclick',e=>{if(!run||end)return;let r=c.getBoundingClientRect(),yy=(e.clientY-r.top)*H/r.height,l=0,b=1e9;lanes.forEach((q,i)=>{let d=Math.abs(yy-ly(i));if(d<b){b=d;l=i}});cycleLaneOrder(l)});
+c.addEventListener('pointerdown',e=>{if(!run||end||count>0)return;let r=c.getBoundingClientRect(),yy=e.clientY-r.top,l=0,b=1e9;lanes.forEach((q,i)=>{let d=Math.abs(yy-ly(i));if(d<b){b=d;l=i}});let d=playerDefs()[sel];
+if(!d || typeof d.cost!=='number'){console.error('Invalid troop definition:',playerCiv,sel,d);return;}
+if(pE>=d.cost){pE-=d.cost;spawn('p',sel,l)}});
+
+
+function unitRole(t){
+ const m=META[t]||{};
+ if(m.kind==='dragon'||/dragon|phoenix|dreadnought/i.test(t))return 'air';
+ if(m.kind==='siege'||/siege|bomber|specialist|walker/i.test(t))return 'siege';
+ if(m.kind==='mage'||/mage|priest|witch|caller|engineer/i.test(t))return 'support';
+ if(/archer|thrower/i.test(t))return 'ranged';
+ if(/guard|guardian|golem|titan|colossus/i.test(t))return 'tank';
+ if(m.kind==='beast'||/beast|wolf|kraken|sphinx|hydra/i.test(t))return 'beast';
+ if(m.kind==='assassin'||/scout|assassin|stalker/i.test(t))return 'skirmisher';
+ return 'melee';
+}
+function combatDamage(attacker,target,amount){
+ let ar=unitRole(attacker.t),tr=unitRole(target.t),m=1;
+ if(ar==='siege'&&tr==='tank')m*=1.18;
+ if(ar==='ranged'&&tr==='skirmisher')m*=1.12;
+ if(ar==='skirmisher'&&(tr==='support'||tr==='ranged'))m*=1.18;
+ if(ar==='beast'&&tr==='ranged')m*=1.12;
+ if(ar==='air'&&tr==='melee')m*=1.12;
+ if(tr==='tank')m*=.84;
+ if(tr==='air'&&!['air','ranged','support'].includes(ar))m*=.72;
+ return amount*m;
+}
+
+function civOfUnit(u){
+ if(['warrior','stoneguard','thrower','archer','crusher','colossus','mountainguard','berserker','mage','siege','beast','commander','giant','worldbreaker','emperor'].includes(u.t))return 'titan';
+ if(['lava','magma','firearcher','ash','golem','flamemage','magmabeast','inferno','bomber','drake','obsidian','eruption','magmatitan','dragon','volcemperor'].includes(u.t))return 'volcanis';
+ if(['frost','icearcher','snowscout','frozenguard','frostmage','icewolf','glacierwarrior','cryoknight','snowgolem','icewitch','frozenbeast','glacierguardian','frostgiant','yeti','iceemperor'].includes(u.t))return 'glacial';
+ if(['skeleton','bonearcher','gravewalker','skeletonknight','ghoul','darkpriest','bonegolem','soulhunter','gravemage','deathknight','corpsebeast','soulreaper','lich','necrodragon','deathemperor'].includes(u.t))return 'necromancer';
+
+ if(['vine','thornarcher','forestscout','rootguard','naturemage','wolfrider','vinebeast','treewarrior','poisonflower','forestguardian','treant','naturewitch','wildtitan','forestdragon','verdantemperor'].includes(u.t))return 'verdantia';
+ if(['shadow','darkarcher','nightscout','shadowguard','voidassassin','darkmage','phantomwolf','shadowknight','nightstalker','wraith','darkbeast','shadowlord','abyssknight','voiddragon','umbralemperor'].includes(u.t))return 'umbral';
+ if(['sunsoldier','lightarcher','solarscout','radiantguard','sunmage','lightknight','solarbeast','radiantassassin','sungolem','phoenixrider','solarguardian','lightpriest','solartitan','lightphoenix','solaremperor'].includes(u.t))return 'solaria';
+ if(['tide','waterarcher','wavescout','coralguard','watermage','sharkrider','tidebeast','seaknight','watergolem','krakenspawn','oceanguardian','stormserpent','deepseatitan','kraken','oceanemperor'].includes(u.t))return 'aqualis';
+ if(['sand','sandarcher','dunescout','desertguard','sandmage','scorpionrider','sandbeast','desertassassin','sandgolem','dunerider','miragewarrior','desertguardian','sandtitan','sphinx','duneemperor'].includes(u.t))return 'dunara';
+ if(['mechsoldier', 'mecharcher', 'mechscout', 'mechguard', 'mechmage', 'mechrider', 'mechbeast', 'mechknight', 'mechgolem', 'mechspecialist', 'mechguardian', 'mechcaller', 'mechtitan', 'mechdragon', 'mechemperor'].includes(u.t))return 'mechanicha';
+ if(['drakesoldier', 'drakearcher', 'drakescout', 'drakeguard', 'drakemage', 'drakerider', 'drakebeast', 'drakeknight', 'drakegolem', 'drakespecialist', 'drakeguardian', 'drakecaller', 'draketitan', 'drakedragon', 'drakeemperor'].includes(u.t))return 'dragonalis';
+ if(['crystalsoldier', 'crystalarcher', 'crystalscout', 'crystalguard', 'crystalmage', 'crystalrider', 'crystalbeast', 'crystalknight', 'crystalgolem', 'crystalspecialist', 'crystalguardian', 'crystalcaller', 'crystaltitan', 'crystaldragon', 'crystalemperor'].includes(u.t))return 'crystalia';
+ if(['sporesoldier', 'sporearcher', 'sporescout', 'sporeguard', 'sporemage', 'sporerider', 'sporebeast', 'sporeknight', 'sporegolem', 'sporespecialist', 'sporeguardian', 'sporecaller', 'sporetitan', 'sporedragon', 'sporeemperor'].includes(u.t))return 'mycelia';
+ if(['astrosoldier', 'astroarcher', 'astroscout', 'astroguard', 'astromage', 'astrorider', 'astrobeast', 'astroknight', 'astrogolem', 'astrospecialist', 'astroguardian', 'astrocaller', 'astrotitan', 'astrodragon', 'astroemperor'].includes(u.t))return 'astralis';
+ return 'tempest';
+}
+function spark(px,py,col,n=8){for(let i=0;i<n;i++)parts.push({x:px,y:py,vx:(Math.random()-.5)*130,vy:(Math.random()-.5)*130,life:.45,r:2+Math.random()*3,col})}
+function enemy(u){
+ let candidates=units.filter(o=>o.s!==u.s&&o.l===u.l&&o.hp>0);
+ if(!candidates.length)return [null,1e9];
+ let role=unitRole(u.t);
+ let best=null,bestScore=1e9;
+ for(let o of candidates){
+   let d=Math.abs(o.x-u.x),score=d;
+   let orole=unitRole(o.t);
+   if(role==='siege') score += 80; // siege prefers advancing unless blocked
+   if(role==='ranged' && orole==='melee') score-=10;
+   if(role==='air' && orole==='ranged') score-=18;
+   if(role==='beast' && orole==='support') score-=22;
+   if(u.t==='soulreaper' && civOfUnit(o)==='necromancer')score-=18;
+   if(score<bestScore){bestScore=score;best=o}
+ }
+ return [best,Math.abs(best.x-u.x)];
+}function fire(u,target,tower){
+ let ranged=u.rg>60,role=unitRole(u.t),civ=civOfUnit(u),mapDmg=mapUnitModifier(u).dm*tc2RoleAttackMult(u,target,tower);
+
+ if(tower){
+   let td=u.dm*mapDmg*(role==='siege'?1.55:1),targetSide=u.s==='p'?'e':'p',sysKey=towerTargetForLane(targetSide,u.l);
+   let targetY=ly(u.l);
+   if(ranged){
+     shots.push({s:u.s,x:u.x,y:u.y-5,tx:tx(targetSide),ty:targetY,dm:td,target:null,tower:true,towerSide:targetSide,sysKey,lane:u.l,life:.28,max:.28,type:civ==='volcanis'?'fire':'rock',source:u});
+   }else{
+     damageTowerSystem(targetSide,sysKey,td,u.s);
+     spark(tx(targetSide),targetY,u.s==='p'?'#a6eeff':'#ff7a4d',11);
+   }
+   return;
+ }
+
+ // Area attack units
+ let aoe=['crusher','mage','worldbreaker','flamemage','eruption','frostmage','icewitch','lich','voltmage','stormcaller'].includes(u.t);
+ if(aoe){
+   let foes=units.filter(q=>q.s!==u.s&&q.l===u.l&&Math.abs(q.x-target.x)<55&&q.hp>0);
+   foes.forEach(q=>{
+     q.hp-=u.dm*mapDmg*(q.fortify>0?.7:1)*(q===target?1:.58);
+     q.hit=.12;
+     if(civ==='glacial')q.slow=Math.max(q.slow,1.8);
+     if(civ==='volcanis')q.burn=Math.max(q.burn,2.2);
+     if(civ==='tempest'&&Math.random()<.35)q.stun=Math.max(q.stun,.35);
+     spark(q.x,q.y,civ==='volcanis'?'#ff793e':civ==='glacial'?'#8eeaff':civ==='tempest'?'#ffe766':'#d8f8ff',6);
+   });
+   return;
+ }
+
+ if(ranged){
+   shots.push({s:u.s,x:u.x,y:u.y-5,tx:target.x,ty:target.y,dm:u.dm*mapDmg,target,tower:false,life:.28,max:.28,type:civ==='volcanis'?'fire':'rock',source:u});
+ }else{
+   target.hp-=combatDamage(u,target,u.dm*mapDmg*(u.formation||1))*(target.fortify>0?.7:1);target.hit=.12;
+   if(target.hp<=0){u.kills=(u.kills||0)+1;if(u.kills>=3&&!u.veteran){u.veteran=true;u.max*=1.12;u.hp=Math.min(u.max,u.hp+u.max*.18);u.dm*=1.1;spark(u.x,u.y,'#ffd75a',16)}
+if(u.kills>=6&&!u.elite){u.elite=true;u.max*=1.08;u.hp=Math.min(u.max,u.hp+u.max*.2);u.dm*=1.08;spark(u.x,u.y,'#ff9cf3',20)}}
+   spark((u.x+target.x)/2,u.y,u.s==='p'?'#d8f8ff':'#ff9b61',9);
+   if(Math.random()<.22)spark(target.x,target.y-8,(CIVSTYLE[civ]||CIVSTYLE.titan).glow,4);
+ }
+}function mapUnitModifier(u){
+ let sp=1,dm=1,heal=0;
+ if(selectedMap==='frozen'&&unitRole(u.t)!=='air')sp*=.93;
+ if(selectedMap==='desert'&&unitRole(u.t)==='skirmisher')sp*=1.08;
+ if(selectedMap==='foundry'&&civOfUnit(u)==='mechanicha')dm*=1.08;
+ if(selectedMap==='forest'&&civOfUnit(u)==='verdantia')heal=.006;
+ if(selectedMap==='volcano'&&(civOfUnit(u)==='volcanis'||civOfUnit(u)==='dragonalis'))dm*=1.07;
+ if(selectedMap==='sunken'&&(civOfUnit(u)==='aqualis'))sp*=1.08;
+ if(selectedMap==='astral'&&(civOfUnit(u)==='astralis'))sp*=1.08;
+ return {sp,dm,heal};
+}
+function updUnit(u,dt){
+ tc2UnitTick(u,dt);
+ u.y=ly(u.l);u.a-=dt;u.hit=Math.max(0,u.hit-dt);u.walk+=dt*8;u.ability-=dt;
+ u.slow=Math.max(0,u.slow-dt);u.stun=Math.max(0,u.stun-dt);u.fortify=Math.max(0,u.fortify-dt);
+
+ if(u.burn>0){u.burn-=dt;u.hp-=6*dt;if(Math.random()<dt*5)spark(u.x,u.y,'#ff7038',1)}
+ if(u.stun>0)return;
+
+ let civ=civOfUnit(u),role=unitRole(u.t),mapFx=mapUnitModifier(u);u.dm=Math.max(u.baseDm*.72,u.dm);if(mapFx.heal)u.hp=Math.min(u.max,u.hp+u.max*mapFx.heal*dt);
+
+ // Passive / special abilities
+ // Civilization identity passives
+ if(civ==='mechanicha'&&u.ability<=0){
+   let allies=units.filter(q=>q.s===u.s&&q.l===u.l&&q.hp>0&&Math.abs(q.x-u.x)<95);
+   if(allies.length){allies.forEach(q=>q.fortify=Math.max(q.fortify,.65));u.ability=5;spark(u.x,u.y,'#ffb84d',6)}
+ }
+ if(civ==='dragonalis'&&u.hp/u.max<.5){u.dm=Math.min(u.dm*1.0008,u.baseDm?u.baseDm*1.18:u.dm*1.18)}
+ if(civ==='crystalia'&&u.hp/u.max<.4)u.fortify=Math.max(u.fortify,.35);
+ if(civ==='mycelia'&&u.ability<=0){
+   let foes=units.filter(q=>q.s!==u.s&&q.l===u.l&&Math.abs(q.x-u.x)<80&&q.hp>0);
+   if(foes.length){foes.forEach(q=>{q.slow=Math.max(q.slow,1.2);q.burn=Math.max(q.burn,.8)});u.ability=5.5;spark(u.x,u.y,'#ef9cff',7)}
+ }
+ if(civ==='astralis'&&u.ability<=0&&Math.random()<.012){
+   let dir=u.s==='p'?1:-1;u.x+=dir*22;u.ability=3.8;spark(u.x,u.y,'#8fe7ff',9);
+ }
+ if(civ==='titan' && u.hp/u.max<.45)u.fortify=Math.max(u.fortify,.2);
+ if(/commander|emperor|lord|queen|king/i.test(u.t)){
+   units.filter(q=>q.s===u.s&&q!==u&&q.l===u.l&&q.hp>0&&Math.abs(q.x-u.x)<115).forEach(q=>q.fortify=Math.max(q.fortify,.18));
+ }
+
+ // Healers/support: every civilization now has support-capable troops.
+ if(role==='support' && Math.abs(u.x-tx(u.s))<175){
+   let sys=towerSys[u.s],key=sys.def.hp>0&&sys.def.hp<sys.def.max?'def':sys.gen.hp>0&&sys.gen.hp<sys.gen.max?'gen':null;
+   if(key){sys[key].hp=Math.min(sys[key].max,sys[key].hp+3.5*dt);syncTowerTotals()}
+ }
+ if(role==='support' && u.ability<=0){
+   let allies=units.filter(q=>q.s===u.s&&q!==u&&q.l===u.l&&q.hp<q.max&&Math.abs(q.x-u.x)<110);
+   if(allies.length){
+     let q=allies.sort((a,b)=>a.hp/a.max-b.hp/b.max)[0];
+     q.hp=Math.min(q.max,q.hp+q.max*.12);spark(q.x,q.y,'#7dff9c',8);u.ability=4.5;
+   }
+ }
+
+ // Necromancer summon
+ if(['gravemage','lich','deathemperor'].includes(u.t) && u.ability<=0){
+   let key='skeleton';
+   if((u.s==='p'&&playerCiv==='necromancer') || (u.s==='e'&&enemyCiv()==='necromancer')){
+     spawn(u.s,key,u.l);u.ability=u.t==='lich'?6:8;
+   }
+ }
+
+ // Charge abilities
+ if(['beast','magmabeast','frozenbeast','thunderbeast','granitebeast'].includes(u.t) && u.ability<=0){
+   let [foe,fd]=enemy(u);
+   if(foe && fd<130 && fd>45){u.x+=(u.s==='p'?1:-1)*38;foe.stun=Math.max(foe.stun,.45);u.ability=5;spark(foe.x,foe.y,'#ffd070',7)}
+ }
+
+ let [o,d]=enemy(u),dir=u.s==='p'?1:-1,td=Math.abs(u.x-tx(u.s==='p'?'e':'p'));
+ let block=blockerFor(u);if(block){if(u.a<=0)hitDebris(u,block);return;}
+
+ // Flying units can ignore ground blockers if tower is reasonably close.
+ if(role==='air' && td<220){o=null;d=1e9;}
+
+ if(o&&d<=u.rg+u.r+o.r){
+   if(u.a<=0){
+     fire(u,o,false);u.a=u.cd;
+     if(civ==='glacial'){o.slow=Math.max(o.slow,1.8);if(Math.random()<.18)o.stun=Math.max(o.stun,.45);}
+     if(civ==='volcanis')o.burn=Math.max(o.burn,2.2);
+     if(civ==='verdantia' && Math.random()<.18)u.hp=Math.min(u.max,u.hp+u.dm*.3);
+     if(civ==='umbral' && Math.random()<.18)o.stun=Math.max(o.stun,.25);
+     if(civ==='solaria' && Math.random()<.16)o.hp-=u.dm*.28;
+     if(civ==='aqualis')o.slow=Math.max(o.slow,1.25);
+     if(civ==='dunara' && Math.random()<.22)o.stun=Math.max(o.stun,.2);
+     if(civ==='mechanicha'&&Math.random()<.22)u.fortify=Math.max(u.fortify,.55);
+     if(civ==='dragonalis'){o.burn=Math.max(o.burn,2.6);if(u.hp/u.max<.5)o.hp-=u.dm*.14}
+     if(civ==='crystalia'&&Math.random()<.2){o.hp-=u.dm*.18;spark(o.x,o.y,'#bfa8ff',5)}
+     if(civ==='mycelia'){o.slow=Math.max(o.slow,1.5);o.burn=Math.max(o.burn,1.2)}
+     if(civ==='astralis'&&Math.random()<.22){o.stun=Math.max(o.stun,.32);u.x+=(u.s==='p'?1:-1)*8}
+     if(civ==='tempest' && Math.random()<.38){
+       let others=units.filter(q=>q.s!==u.s&&q!==o&&q.l===u.l&&Math.abs(q.x-o.x)<95&&q.hp>0);
+       if(others.length){let q=others[Math.floor(Math.random()*others.length)];q.hp-=u.dm*.45;spark(q.x,q.y,'#ffe766',8)}
+     }
+   }
+ }else if(!o&&td<=u.rg+55){
+   if(u.a<=0){fire(u,null,true);u.a=u.cd}
+ }else{
+   if((role==='ranged'||role==='support')&&o&&d<70){
+     let back=u.s==='p'?-1:1;u.x+=back*u.sp*.28*dt;return;
+   }
+   let speed=u.sp*(u.slow>0?.58:1)*mapFx.sp;
+   if(u.s==='p'){if(laneOrders[u.l]==='rush')speed*=1.16;if(laneOrders[u.l]==='hold'&&Math.abs(u.x-tx('p'))>220)speed*=.45;}
+   if(civ==='tempest')speed*=1.08;
+   if(role==='air')speed*=1.08;
+   u.x+=dir*speed*dt;
+ }
+}function updShots(dt){for(let s of shots){s.life-=dt;let f=1-s.life/s.max;s.cx=s.x+(s.tx-s.x)*f;s.cy=s.y+(s.ty-s.y)*f-25*Math.sin(Math.PI*f);if(s.life<=0){if(s.tower){damageTowerSystem(s.towerSide|| (s.s==='p'?'e':'p'),s.sysKey||'core',s.dm,s.s);spark(s.tx,s.ty,s.s==='p'?'#d9f7ff':'#ff6b3f',12)}else if(s.target&&s.target.hp>0){let dealt=s.source?combatDamage(s.source,s.target,s.dm):s.dm;dealt*=s.target.fortify>0?.7:1;s.target.hp-=dealt;s.target.hit=.12;
+if(s.target.hp<=0&&s.source){s.source.kills=(s.source.kills||0)+1;if(s.source.kills>=3&&!s.source.veteran){s.source.veteran=true;s.source.max*=1.12;s.source.hp=Math.min(s.source.max,s.source.hp+s.source.max*.18);s.source.dm*=1.1;spark(s.source.x,s.source.y,'#ffd75a',16)}}
+let sc=s.source?civOfUnit(s.source):null;
+if(sc==='glacial')s.target.slow=Math.max(s.target.slow,1.6);
+if(sc==='volcanis')s.target.burn=Math.max(s.target.burn,2);
+if(sc==='tempest'&&Math.random()<.2)s.target.stun=Math.max(s.target.stun,.3);spark(s.tx,s.ty,s.s==='p'?'#d9f7ff':'#ff7a45',8)}}}shots=shots.filter(s=>s.life>0)}
+function updNode(dt){let a=units.filter(u=>u.s==='p'&&Math.abs(u.x-W/2)<80).length,b=units.filter(u=>u.s==='e'&&Math.abs(u.x-W/2)<80).length;if(a>b){node=Math.min(1,node+dt*.25);if(node===1)nodeOwner='p'}else if(b>a){node=Math.max(-1,node-dt*.25);if(node===-1)nodeOwner='e'}}
+function aiLaneScore(l){
+ let pressure=0;
+ units.forEach(u=>{if(u.l!==l||u.hp<=0)return;let power=(u.hp/u.max)*Math.max(1,u.dm);pressure+=(u.s==='p'?1:-.55)*power});
+ let targetSide='p',key=towerTargetForLane(targetSide,l),module=towerSys.p[key];
+ if(module&&module.hp>0)pressure+=((module.max-module.hp)/module.max)*55;
+ return pressure;
+}
+function chooseAILane(){
+ let scores=[0,1,2].map(aiLaneScore),best=scores.indexOf(Math.max(...scores));
+ if(Math.random()<.22)best=Math.floor(Math.random()*3);
+ return best;
+}
+function aiUnitWeight(k,d,lane){
+ let role=unitRole(k),w=1,cost=d.cost||4;
+ let difficulty=battleMode==='ranked'?rankedAILevel():1;w*=difficulty;
+ let enemyUnits=units.filter(u=>u.s==='p'&&u.l===lane&&u.hp>0);
+ let air=enemyUnits.filter(u=>unitRole(u.t)==='air').length;
+ let tanks=enemyUnits.filter(u=>unitRole(u.t)==='tank').length;
+ let swarm=enemyUnits.length;
+ if(eE>=8&&cost>=7)w*=2.2;
+ if(eE<=4&&cost<=3)w*=1.7;
+ if(swarm>=3&&(role==='ranged'||role==='support'||role==='siege'))w*=1.65;
+ if(tanks>=2&&(role==='siege'||role==='support'))w*=1.45;
+ if(air>0&&(role==='ranged'||role==='air'))w*=1.5;
+ if(role==='tank'&&swarm>=2)w*=1.35;
+ if(role==='skirmisher'&&swarm<=1)w*=1.3;
+ if(recentEnemy.includes(k))w*=.42;
+ return tc2AIWeight(k,d,lane,w);
+}
+function enemyUsePower(){
+ if(!run||end||count>0)return;
+ let civ=enemyCiv(),choice=Math.random();
+ if(choice<.32&&towerSys.e.core.hp/towerSys.e.core.max<.62){
+   enemyShieldTime=5.5;spark(tx('e'),H*.53,(CIVSTYLE[civ]||CIVSTYLE.volcanis).glow,18);banner('ENEMY WARD',550);
+ }else{
+   let victims=units.filter(u=>u.s==='p'&&u.hp>0);
+   if(victims.length){
+     let lane=[0,1,2].sort((a,b)=>victims.filter(u=>u.l===b).length-victims.filter(u=>u.l===a).length)[0];
+     victims.filter(u=>u.l===lane).forEach(u=>{
+       let dmg=battleMode==='ranked'?34:28;u.hp-=dmg;u.hit=.14;
+       if(civ==='volcanis'||civ==='dragonalis')u.burn=Math.max(u.burn,2.2);
+       if(civ==='glacial'||civ==='aqualis')u.slow=Math.max(u.slow,2.2);
+       if(civ==='tempest'||civ==='astralis')u.stun=Math.max(u.stun,.35);
+       spark(u.x,u.y,(CIVSTYLE[civ]||CIVSTYLE.volcanis).glow,7);
+     });
+     banner('ENEMY POWER',500);
+   }
+ }
+ enemyPowerCD=(battleMode==='ranked'?8:11)+Math.random()*5;
+}
+function updateLaneThreat(){
+ let el=document.getElementById('laneThreat');if(!el)return;
+ let vals=[0,1,2].map(l=>{
+   let p=units.filter(u=>u.s==='p'&&u.l===l&&u.hp>0).reduce((a,u)=>a+u.dm*(u.hp/u.max),0);
+   let e=units.filter(u=>u.s==='e'&&u.l===l&&u.hp>0).reduce((a,u)=>a+u.dm*(u.hp/u.max),0);
+   return p-e;
+ });
+ let tag=v=>v>18?'▲':v<-18?'▼':'•';
+ let o=laneOrders.map(q=>q==='rush'?'⚡':q==='hold'?'🛡️':'➜');
+ el.textContent=`TOP ${tag(vals[0])}${o[0]} • MID ${tag(vals[1])}${o[1]} • BOT ${tag(vals[2])}${o[2]}`;
+}
+function laneControl(l){
+ let p=units.filter(u=>u.s==='p'&&u.l===l&&u.hp>0).reduce((a,u)=>a+u.hp/u.max,0);
+ let e=units.filter(u=>u.s==='e'&&u.l===l&&u.hp>0).reduce((a,u)=>a+u.hp/u.max,0);
+ return p>e+.55?'p':e>p+.55?'e':'n';
+}
+function comebackFactor(side){
+ let mine=side==='p'?pT:eT,other=side==='p'?eT:pT,diff=other-mine;
+ return diff>450?1.12:diff>250?1.07:1;
+}
+function updateCombatStatus(){
+ let el=document.getElementById('combatStatus');if(!el)return;
+ let pAlive=['def','gen','core'].filter(k=>towerSys.p[k].hp>0).length,eAlive=['def','gen','core'].filter(k=>towerSys.e[k].hp>0).length;
+ let burning=units.filter(u=>u.burn>0).length,frozen=units.filter(u=>u.slow>0).length;
+ let enemyRoles=units.filter(u=>u.s==='e'&&u.hp>0).map(u=>unitRole(u.t)),hint=enemyRoles.filter(r=>r==='tank').length>=2?'USE SIEGE':enemyRoles.filter(r=>r==='air').length>=2?'USE RANGED':'PRESSURE';
+ el.textContent=`${rankName(rankedRating)} ${battleMode==='ranked'?rankedRating+' RP':'• CASUAL'} • ${hint} • 🔥${burning} ❄️${frozen}`;
+}
+function update(dt){dt=Math.min(dt,tc2On(91)?.04:.05);if(end)return;if(count>0){count-=dt;msg.textContent=count>2.3?'3':count>1.45?'2':count>.65?'1':'CLASH! ⚔️';if(count<=0)msg.textContent='';return}time=Math.max(0,time-dt);
+if(time<=180&&!overdriveAnnounced){overdriveAnnounced=true;banner('⚡ OVERDRIVE',1300);spark(W/2,H*.5,'#ffe36b',28)}
+if(time<=60&&!finalMinuteAnnounced){finalMinuteAnnounced=true;banner('🔥 FINAL MINUTE',1300);spark(W/2,H*.5,'#ff7045',34)}
+shieldTime=Math.max(0,shieldTime-dt);enemyShieldTime=Math.max(0,enemyShieldTime-dt);enemyPowerCD-=dt;if(enemyPowerCD<=0)enemyUsePower();meteorCD=Math.max(0,meteorCD-dt);shieldCD=Math.max(0,shieldCD-dt);let pMod=towerModuleEffects('p'),eMod=towerModuleEffects('e');
+ultimate=Math.min(100,ultimate+dt*(tc2On(75)?.72:.65)*(pMod.energy<1?.72:1)*(tc2On(80)&&pT<eT-350?1.12:1));
+let rg=time<=60?.82:time<=180?.62:.4;let pGen=pMod.energy,eGen=eMod.energy;if(battleMode==='ranked'){rg=time<=60?.9:time<=180?.68:.42;}let pL=[0,1,2].filter(l=>laneControl(l)==='p').length,eL=[0,1,2].filter(l=>laneControl(l)==='e').length;
+pE=adminEnergy?10:Math.min(10,pE+rg*(nodeOwner==='p'?1.1:1)*(1+pL*.025)*pGen*comebackFactor('p')*dt);
+eE=Math.min(10,eE+rg*(nodeOwner==='e'?1.1:1)*(1+eL*.025)*eGen*comebackFactor('e')*dt);ai-=dt;if(ai<=0){
+ let edefs=enemyDefs();
+ let affordable=Object.keys(edefs).filter(k=>typeof edefs[k].cost==='number'&&edefs[k].cost<=eE);
+ if(affordable.length){
+   let lane=chooseAILane();
+   let weights=affordable.map(k=>aiUnitWeight(k,edefs[k],lane));
+   let total=weights.reduce((a,b)=>a+b,0),roll=Math.random()*total,k=affordable[0];
+   for(let i=0;i<affordable.length;i++){roll-=weights[i];if(roll<=0){k=affordable[i];break}}
+   eE-=edefs[k].cost;spawn('e',k,lane);
+   recentEnemy.push(k);if(recentEnemy.length>3)recentEnemy.shift();
+ }
+ let diff=battleMode==='ranked'?rankedAILevel()*(tc2On(61)?1.035:1):1;
+ ai=(battleMode==='ranked'?.82/diff:1.0)+Math.random()*(battleMode==='ranked'?.88/diff:1.25);
+}if(towerSys.p.core.hp>0&&towerSys.p.core.hp/towerSys.p.core.max<.3&&Math.random()<dt*2)spark(tx('p'),H*.55,'#ff4d45',2);
+if(towerSys.e.core.hp>0&&towerSys.e.core.hp/towerSys.e.core.max<.3&&Math.random()<dt*2)spark(tx('e'),H*.55,'#ff4d45',2);
+updNode(dt);units.forEach(u=>updUnit(u,dt));updShots(dt);updateTowerDefenses(dt);updateDebris(dt);tc2TowerTick(dt);tc2ArenaTick(dt);tc2BattleEvent(dt);tc2Safety(dt);let survivors=[];
+for(let u of units){
+ if(u.hp>0){survivors.push(u);continue}
+ if(u.s==='e')battleStats.kills++;else battleStats.unitsLost++;
+ if(civOfUnit(u)==='necromancer' && !u.revived && Math.random()<.38){
+   u.revived=true;u.hp=u.max*.35;u.hit=.2;spark(u.x,u.y,'#bd7cff',14);survivors.push(u);
+ }
+}
+units=survivors;updateCombatStatus();updateLaneThreat();tc2UI();parts.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.96;p.vy*=.96;p.life-=dt});parts=parts.filter(p=>p.life>0);if(towerSys.e.core.hp<=0)finish('🏆 VICTORY!');else if(towerSys.p.core.hp<=0)finish('💀 DEFEAT');else if(time<=0){
+ if(pT>eT)finish('🏆 VICTORY!');
+ else if(eT>pT)finish('💀 DEFEAT');
+ else if(!suddenDeath){suddenDeath=true;time=suddenTime;banner('☠️ SUDDEN DEATH',1400);towerSys.p.core.hp=Math.min(towerSys.p.core.hp,220);towerSys.e.core.hp=Math.min(towerSys.e.core.hp,220);syncTowerTotals()}
+ else finish('⚔️ DRAW');
+}}
+function finish(t){if(end)return;end=true;msg.textContent=t;again.style.display='block';let win=t.includes('VICTORY');setTimeout(()=>showResult(win),500)}
+function hill(){x.fillStyle='#0b1119';x.beginPath();x.moveTo(0,H*.22);for(let i=0;i<=8;i++)x.lineTo(i*W/8,H*(.13+Math.random()*.08));x.lineTo(W,0);x.lineTo(0,0);x.fill()}
+function bg(){
+  const m=selectedMap;
+  const skies={titan:['#101a29','#4d6070'],volcano:['#1a1012','#6b2a1d'],frozen:['#102533','#8fd8ee'],forest:['#0d2418','#38634a'],desert:['#3b2b1a','#d2a25c'],foundry:['#16191d','#4d555d'],sunken:['#0a2635','#28799a'],astral:['#120f2c','#4e3c84']};
+  let sk=skies[m]||skies.titan,g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,sk[0]);g.addColorStop(1,sk[1]);x.fillStyle=g;x.fillRect(0,0,W,H);
+  // distant silhouettes unique to each arena
+  if(m==='titan'){
+    x.fillStyle='#23303a';for(let i=0;i<7;i++){let px=i*W/6;x.beginPath();x.moveTo(px-W*.12,H*.29);x.lineTo(px,H*(.07+(i%3)*.035));x.lineTo(px+W*.14,H*.29);x.fill()}
+  }else if(m==='volcano'){
+    x.fillStyle='#24171a';x.beginPath();x.moveTo(W*.5,H*.28);x.lineTo(W*.68,H*.045);x.lineTo(W*.86,H*.28);x.fill();x.fillStyle='#ff5b2a';x.beginPath();x.moveTo(W*.64,H*.10);x.lineTo(W*.68,H*.045);x.lineTo(W*.72,H*.10);x.fill();
+  }else if(m==='frozen'){
+    x.fillStyle='#b9edf7aa';for(let i=0;i<8;i++){let px=i*W/7;x.beginPath();x.moveTo(px,H*.27);x.lineTo(px+W*.04,H*(.08+(i%2)*.05));x.lineTo(px+W*.08,H*.27);x.fill()}
+  }else if(m==='forest'){
+    for(let i=0;i<18;i++){let px=(i+.4)*W/18,h=H*(.11+(i%5)*.018);x.fillStyle=i%2?'#173c27':'#1f4a30';x.fillRect(px-3,H*.29-h,6,h);x.beginPath();x.arc(px,H*.29-h,18+(i%3)*4,0,7);x.fill()}
+  }else if(m==='desert'){
+    x.fillStyle='#9b7343';x.beginPath();x.moveTo(0,H*.27);x.quadraticCurveTo(W*.25,H*.15,W*.5,H*.27);x.quadraticCurveTo(W*.75,H*.17,W,H*.26);x.lineTo(W,H*.36);x.lineTo(0,H*.36);x.fill();x.fillStyle='#6d5235';x.fillRect(W*.68,H*.12,10,H*.14);x.fillRect(W*.64,H*.12,W*.12,10);
+  }else if(m==='foundry'){
+    x.fillStyle='#252a30';for(let i=0;i<5;i++){let px=W*(.12+i*.19);x.fillRect(px,H*.08,24,H*.2);x.fillStyle='#ff943d66';x.fillRect(px+6,H*.13,12,H*.11);x.fillStyle='#252a30'}x.strokeStyle='#73808d';x.lineWidth=5;x.beginPath();x.moveTo(0,H*.13);x.lineTo(W,H*.13);x.stroke();
+  }else if(m==='sunken'){
+    x.fillStyle='#6ed9f244';for(let i=0;i<10;i++){x.beginPath();x.arc((i*113)%W,H*(.06+(i%4)*.05),3+(i%3)*2,0,7);x.fill()}x.fillStyle='#183b4b';for(let i=0;i<6;i++){let px=W*(.1+i*.17);x.fillRect(px,H*.16,10,H*.13);x.beginPath();x.arc(px+5,H*.16,18,Math.PI,0);x.fill()}
+  }else if(m==='astral'){
+    x.fillStyle='#e7e5ff';for(let i=0;i<45;i++){let px=(i*97)%W,py=(i*53)%(H*.28);x.globalAlpha=.35+(i%4)*.15;x.beginPath();x.arc(px,py,1+(i%3)*.45,0,7);x.fill()}x.globalAlpha=1;x.strokeStyle='#8fe7ff88';x.lineWidth=3;x.beginPath();x.arc(W*.72,H*.13,38,0,7);x.stroke();x.beginPath();x.ellipse(W*.72,H*.13,60,14,-.2,0,7);x.stroke();
+  }
+  // arena floor
+  const floors={titan:['#465566','#27333f'],volcano:['#46332d','#241d20'],frozen:['#86bed0','#315767'],forest:['#355c40','#1b3324'],desert:['#b28a55','#60472d'],foundry:['#4a5057','#252a2f'],sunken:['#397a8f','#183d4c'],astral:['#40385f','#221d38']};let fl=floors[m]||floors.titan,gg=x.createLinearGradient(0,H*.22,0,H*.92);gg.addColorStop(0,fl[0]);gg.addColorStop(1,fl[1]);x.fillStyle=gg;x.fillRect(0,H*.22,W,H*.7);
+  lanes.forEach((q,i)=>{let y=ly(i),h=H*(.052+i*.009),inset=i===0?W*.055:i===1?W*.025:0;x.fillStyle=m==='frozen'?'#a5d8e5aa':m==='desert'?'#8a6944aa':m==='forest'?'#294b35cc':m==='foundry'?'#3b4249':m==='astral'?'#332c50':m==='sunken'?'#2c6478':m==='volcano'?'#3a2a28':'#39495c';x.beginPath();x.moveTo(inset,y-h);x.lineTo(W-inset,y-h);x.lineTo(W,y+h);x.lineTo(0,y+h);x.closePath();x.fill();x.strokeStyle='#d5e6f044';x.lineWidth=1.4;x.setLineDash([18,20]);x.beginPath();x.moveTo(inset,y);x.lineTo(W-inset,y);x.stroke();x.setLineDash([])});
+  // foreground details
+  if(m==='volcano'){x.fillStyle='#7d2d1d';x.fillRect(0,H*.89,W,H*.11);for(let i=0;i<24;i++){x.fillStyle=i%2?'#ff5425':'#ffae35';x.globalAlpha=.45;x.beginPath();x.arc((i*97)%W,H*.91+(i%4)*9,2+(i%4),0,7);x.fill()}x.globalAlpha=1}
+  if(m==='frozen'){x.fillStyle='#d5f6ff55';for(let i=0;i<18;i++){let px=(i*131)%W,py=H*(.3+((i*37)%55)/100);x.fillRect(px,py,14,3)}}
+  if(m==='forest'){x.fillStyle='#173821';for(let i=0;i<12;i++){let px=(i*151)%W;x.fillRect(px,H*.83,5,H*.09);x.beginPath();x.arc(px,H*.82,15,0,7);x.fill()}}
+  if(m==='desert'){x.fillStyle='#d0ad70aa';for(let i=0;i<20;i++){x.beginPath();x.arc((i*83)%W,H*.88+(i%3)*8,3+(i%4),0,7);x.fill()}}
+  if(m==='foundry'){x.strokeStyle='#f6a14788';x.lineWidth=4;for(let i=0;i<6;i++){x.beginPath();x.moveTo(i*W/5,H*.88);x.lineTo(i*W/5+W*.08,H);x.stroke()}}
+  if(m==='sunken'){x.fillStyle='#76e8ff22';x.fillRect(0,H*.82,W,H*.18);x.strokeStyle='#8eeeff66';for(let i=0;i<7;i++){x.beginPath();x.arc(i*W/6,H*.9,20,Math.PI,0);x.stroke()}}
+  if(m==='astral'){x.fillStyle='#8f73ff22';for(let i=0;i<10;i++){x.beginPath();x.arc((i*149)%W,H*(.3+((i*29)%56)/100),5+(i%3)*2,0,7);x.fill()}}
+  drawNode();
+}
+function drawNode(){let y=ly(1),col=nodeOwner==='p'?'#56e8ff':nodeOwner==='e'?'#ff7550':'#ffd65c';x.save();x.translate(W/2,y);x.shadowColor=col;x.shadowBlur=25;x.fillStyle='#172330';x.beginPath();x.arc(0,0,31,0,7);x.fill();x.strokeStyle=col;x.lineWidth=3;x.stroke();x.font='21px Arial';x.textAlign='center';x.textBaseline='middle';x.fillStyle=col;x.fillText('⚡',0,1);x.restore();x.fillStyle='#111820';x.fillRect(W/2-42,y+39,84,5);x.fillStyle=node>=0?'#55e6ff':'#ff7755';let w=42*Math.abs(node);if(node>=0)x.fillRect(W/2,y+39,w,5);else x.fillRect(W/2-w,y+39,w,5)}
+function tower(s,hp){
+let px=tx(s),py=H*.53,isP=s==='p',main=isP?'#596f87':'#6f3023',edge=isP?'#b8d0e5':'#e87043',glow=isP?'#55e4ff':'#ff6035',sys=towerSys[s];
+x.save();x.translate(px,py);
+x.fillStyle='#0008';x.beginPath();x.ellipse(0,76,67,19,0,0,7);x.fill();
+// base platform
+x.fillStyle=isP?'#344556':'#4b2924';x.beginPath();x.ellipse(0,58,55,18,0,0,7);x.fill();
+// tower body
+x.fillStyle=main;x.strokeStyle=edge;x.lineWidth=3;
+x.beginPath();x.moveTo(-43,61);x.lineTo(-36,-33);x.lineTo(-27,-70);x.lineTo(27,-70);x.lineTo(36,-33);x.lineTo(43,61);x.closePath();x.fill();x.stroke();
+// upper crown
+x.fillStyle=main;x.fillRect(-34,-82,68,18);x.strokeRect(-34,-82,68,18);
+for(let i=-2;i<=2;i++){x.fillRect(i*15-6,-96,12,20);x.strokeRect(i*15-6,-96,12,20)}
+// armor plates
+x.strokeStyle=edge+'99';x.lineWidth=2;for(let yy=-48;yy<50;yy+=27){x.beginPath();x.moveTo(-30,yy);x.lineTo(30,yy);x.stroke()}
+// generator module
+x.fillStyle=sys.gen.hp>0?'#ffe05d':'#2c2b28';x.strokeStyle='#fff6';x.lineWidth=2;x.beginPath();x.arc(0,48,10,0,7);x.fill();x.stroke();
+// glowing core
+x.shadowColor=glow;x.shadowBlur=sys.core.hp>0?25:0;x.fillStyle=sys.core.hp>0?glow:'#251416';x.beginPath();x.arc(0,18,14,0,7);x.fill();x.shadowBlur=0;
+// defense cannon
+let d=isP?1:-1;if(sys.def.hp>0){x.fillStyle=edge;x.fillRect(d*29,-31,d*38,10);x.beginPath();x.arc(d*31,-26,12,0,7);x.fill()}else{x.fillStyle='#24272a';x.save();x.translate(d*35,-24);x.rotate(.55*d);x.fillRect(-5,-4,d*30,8);x.restore()}
+// progressive module destruction: each module visibly disappears when destroyed
+if(sys.gen.hp<=0){x.fillStyle='#0b0d10';x.fillRect(-18,5,36,26);x.strokeStyle='#ffb34766';x.lineWidth=3;x.beginPath();x.moveTo(-15,8);x.lineTo(14,28);x.moveTo(14,8);x.lineTo(-14,28);x.stroke()}
+if(sys.core.hp<=0){x.fillStyle='#090a0c';x.fillRect(-25,34,50,38);x.strokeStyle='#ff4f4f66';x.lineWidth=4;x.beginPath();x.moveTo(-21,38);x.lineTo(20,68);x.moveTo(20,38);x.lineTo(-20,68);x.stroke()}
+// damage states
+if(hp<1050){x.strokeStyle='#15171a';x.lineWidth=5;x.beginPath();x.moveTo(-14,-53);x.lineTo(5,-30);x.lineTo(-8,-5);x.lineTo(8,10);x.stroke()}
+if(hp<750){x.fillStyle='#17191b';x.beginPath();x.arc(18,42,13,0,7);x.fill();x.fillStyle='#ff6a3266';x.beginPath();x.arc(18,42,7,0,7);x.fill()}
+if(hp<400){x.save();x.translate(-23,-75);x.rotate(-.15*d);x.fillStyle=main;x.fillRect(-11,-7,22,14);x.restore();for(let i=0;i<5;i++){x.fillStyle='#49515a';x.fillRect(-42+i*15,65+(i%2)*5,8,6)}}
+x.restore();
+ // module health markers
+ const marks=[['DEF',sys.def,-62],['GEN',sys.gen,-47],['CORE',sys.core,-32]];x.font='7px Arial';x.textAlign='center';for(const [label,m,off] of marks){x.fillStyle='#0b1018cc';x.fillRect(px-27,py+off,54,7);x.fillStyle=m.hp<=0?'#ff5a4f':m.hp/m.max<.35?'#ffd35a':(isP?'#67e8ff':'#ff7958');x.fillRect(px-27,py+off,54*Math.max(0,m.hp/m.max),7);x.fillStyle='#fff';x.fillText(label,px,py+off+6)}
+ if(hp<850){
+   x.fillStyle='#59616a88';
+   for(let i=0;i<3;i++){
+     let sx=px+(isP?18:-18);
+     let sy=py-35-i*13-Math.sin(performance.now()/350+i)*5;
+     x.beginPath();x.arc(sx-px,sy-py,7+i*2,0,7);x.fill();
+   }
+ }
+ if(hp<430){
+   x.fillStyle='#ff793d';
+   let flameX=isP?14:-14;
+   x.beginPath();
+   x.moveTo(flameX-8,35);
+   x.lineTo(flameX,8-Math.sin(performance.now()/170)*6);
+   x.lineTo(flameX+8,35);
+   x.closePath();x.fill();
+ }
+}function humanoid(u){
+let m=META[u.t]||{kind:'human',weapon:'sword',scale:1,accent:'#fff'},bob=Math.sin(u.walk)*2.2-(u.air?12:0),dir=u.s==='p'?1:-1,isP=u.s==='p';
+let civ=civOfUnit(u),sty=CIVSTYLE[civ]||CIVSTYLE.titan;
+let base=sty.base,dark=sty.dark,accent=m.accent||sty.accent;
+x.save();x.translate(u.x,u.y+bob);x.scale(dir*m.scale,m.scale);
+// status readability
+if(u.veteran){x.fillStyle=u.elite?'#ff9cf3':'#ffd75a';x.font='bold 9px Arial';x.fillText(u.elite?'★★':'★',u.elite?-6:-3,-39)}
+if(u.burn>0){x.fillStyle='#ff7038aa';x.beginPath();x.arc(0,-25,4,0,7);x.fill()}
+if(u.slow>0){x.strokeStyle='#8eeaffaa';x.lineWidth=2;x.beginPath();x.arc(0,2,19,0,7);x.stroke()}
+if(u.stun>0){x.fillStyle='#ffe56b';x.font='10px Arial';x.fillText('✦',-3,-31)}
+if(u.fortify>0){x.strokeStyle='#9fe7ffaa';x.lineWidth=2;x.strokeRect(-17,-23,34,43)}
+
+// Civilization visual identity
+if(civ==='verdantia'){
+ x.strokeStyle='#78ef8c88';x.lineWidth=2;
+ x.beginPath();x.moveTo(-9,-10);x.quadraticCurveTo(-15,-18,-8,-25);x.stroke();
+ x.beginPath();x.moveTo(8,-8);x.quadraticCurveTo(15,-15,11,-23);x.stroke();
+}
+if(civ==='umbral'){
+ x.globalAlpha=.22;x.fillStyle='#9b67ff';x.beginPath();x.arc(-5,4,15,0,7);x.fill();x.globalAlpha=1;
+}
+if(civ==='solaria'){
+ x.shadowColor='#ffe56b';x.shadowBlur=12;
+}
+if(civ==='aqualis'){
+ x.strokeStyle='#64dfff88';x.lineWidth=2;
+ x.beginPath();x.arc(0,2,17,-.6,.7);x.stroke();
+}
+if(civ==='dunara'){
+ x.fillStyle='#e8c47a88';
+ x.beginPath();x.moveTo(-12,10);x.lineTo(-18,17);x.lineTo(-7,15);x.closePath();x.fill();
+}
+
+
+if(civ==='mechanicha'){x.strokeStyle='#ffb84d';x.lineWidth=2;x.strokeRect(-13,-11,26,25)}
+if(civ==='dragonalis'){x.fillStyle='#ff684f55';x.beginPath();x.moveTo(-12,-6);x.lineTo(-22,-18);x.lineTo(-5,-13);x.fill()}
+if(civ==='crystalia'){x.fillStyle='#bfa8ff66';x.beginPath();x.moveTo(0,-31);x.lineTo(6,-21);x.lineTo(0,-14);x.lineTo(-6,-21);x.fill()}
+if(civ==='mycelia'){x.fillStyle='#ef9cff88';x.beginPath();x.arc(0,-27,8,Math.PI,0);x.fill()}
+if(civ==='astralis'){x.fillStyle='#8fe7ff';x.beginPath();x.arc(0,-28,2.5,0,7);x.fill()}
+// shadow
+x.fillStyle='#0007';x.beginPath();x.ellipse(0,18,14,5,0,0,7);x.fill();
+
+if(m.kind==='dragon'){
+ x.fillStyle=u.hit?'#fff':(isP?'#738da6':'#a9472f');
+ x.beginPath();x.moveTo(-15,2);x.quadraticCurveTo(-5,-12,8,-6);x.quadraticCurveTo(18,-2,15,7);x.quadraticCurveTo(3,14,-10,8);x.closePath();x.fill();
+ x.fillStyle=accent;
+x.beginPath();x.moveTo(-3,-4);x.quadraticCurveTo(-20,-22,-15,-4);x.lineTo(-8,2);x.closePath();x.fill();
+x.beginPath();x.moveTo(3,-4);x.quadraticCurveTo(20,-22,15,-4);x.lineTo(8,2);x.closePath();x.fill();
+ x.fillStyle=dark;x.beginPath();x.arc(12,-5,5,0,7);x.fill();x.fillStyle='#ffd45a';x.fillRect(13,-7,2,2);
+ x.strokeStyle=accent;x.lineWidth=3;x.beginPath();x.moveTo(-12,5);x.quadraticCurveTo(-25,3,-27,10);x.stroke();
+}else if(m.kind==='beast'){
+ x.fillStyle=u.hit?'#fff':(isP?'#687d8e':'#8f3d2a');x.beginPath();x.ellipse(0,2,15,10,0,0,7);x.fill();
+ x.beginPath();x.arc(12,-3,7,0,7);x.fill();x.strokeStyle=accent;x.lineWidth=2;x.beginPath();x.moveTo(15,-4);x.lineTo(23,-7);x.moveTo(15,0);x.lineTo(23,3);x.stroke();
+ x.strokeStyle=dark;x.lineWidth=4;[-8,5].forEach(q=>{x.beginPath();x.moveTo(q,8);x.lineTo(q-2,17);x.stroke()});
+}else if(m.kind==='golem'){
+ x.fillStyle=u.hit?'#fff':(isP?'#6c7f90':'#754034');
+ x.fillRect(-12,-8,24,24);x.fillRect(-16,-3,7,19);x.fillRect(9,-3,7,19);x.beginPath();x.arc(0,-15,9,0,7);x.fill();
+ x.strokeStyle=accent;x.lineWidth=2;x.strokeRect(-12,-8,24,24);
+}else if(m.kind==='siege'){
+ x.fillStyle=dark;x.fillRect(-15,5,30,10);x.fillStyle=base;x.fillRect(-12,-8,24,16);
+ x.strokeStyle=accent;x.lineWidth=4;x.beginPath();x.moveTo(4,-5);x.lineTo(21,-14);x.stroke();
+ x.fillStyle=accent;x.beginPath();x.arc(-9,16,5,0,7);x.arc(9,16,5,0,7);x.fill();
+}else{
+ // humanoid / mage / giant / emperor / assassin
+ x.strokeStyle=dark;x.lineWidth=4;x.lineCap='round';
+ x.beginPath();x.moveTo(-4,8);x.lineTo(-8,19+Math.sin(u.walk)*3);x.moveTo(4,8);x.lineTo(8,19-Math.sin(u.walk)*3);x.stroke();
+ x.fillStyle=u.hit?'#fff':base;x.fillRect(-9,-9,18,21);
+ x.fillStyle=dark;x.fillRect(-8,-4,16,4);
+ x.fillStyle=isP?'#c8d8e5':'#d46b43';x.beginPath();x.arc(0,-15,8,0,7);x.fill();
+ x.fillStyle=accent;x.beginPath();x.arc(0,-17,9,Math.PI,0);x.fill();x.fillRect(-9,-17,18,3);
+ if(m.kind==='emperor'){x.fillStyle='#ffd84a';x.beginPath();x.moveTo(-7,-25);x.lineTo(-3,-31);x.lineTo(0,-25);x.lineTo(4,-32);x.lineTo(8,-25);x.closePath();x.fill()}
+ if(m.kind==='mage'){x.strokeStyle=accent;x.lineWidth=3;x.beginPath();x.moveTo(8,7);x.lineTo(15,-17);x.stroke();x.fillStyle=accent;x.beginPath();x.arc(15,-18,4,0,7);x.fill()}
+ else if(m.weapon==='bow'){x.strokeStyle=accent;x.lineWidth=2;x.beginPath();x.arc(8,-2,12,-1.25,1.25);x.stroke();x.beginPath();x.moveTo(12,-13);x.lineTo(12,9);x.stroke()}
+ else if(m.weapon==='shield'||m.weapon==='towerShield'){x.fillStyle=accent;x.beginPath();x.moveTo(8,-9);x.quadraticCurveTo(23,-6,18,12);x.quadraticCurveTo(10,17,7,7);x.closePath();x.fill()}
+ else if(m.weapon==='axe'){x.strokeStyle=accent;x.lineWidth=4;x.beginPath();x.moveTo(6,2);x.lineTo(18,-12);x.stroke();x.fillStyle=accent;x.beginPath();x.arc(19,-13,7,-1.2,1.2);x.fill()}
+ else if(m.weapon==='hammer'||m.weapon==='maul'||m.weapon==='club'){x.strokeStyle=accent;x.lineWidth=5;x.beginPath();x.moveTo(6,2);x.lineTo(19,-15);x.stroke();x.fillStyle=dark;x.fillRect(14,-21,m.weapon==='maul'?17:13,10)}
+ else if(m.weapon==='banner'){x.strokeStyle=accent;x.lineWidth=3;x.beginPath();x.moveTo(8,10);x.lineTo(8,-24);x.stroke();x.fillStyle='#ffd84a';x.fillRect(9,-24,15,9)}
+ else {x.strokeStyle=accent;x.lineWidth=3;x.beginPath();x.moveTo(6,-1);x.lineTo(18,-10);x.stroke()}
+}
+x.restore();
+x.fillStyle='#10161e';x.fillRect(u.x-19,u.y-u.r-20,38,4);x.fillStyle=isP?'#62e7ff':'#ff684b';x.fillRect(u.x-19,u.y-u.r-20,38*Math.max(0,u.hp/u.max),4);
+if(u.slow>0){x.fillStyle='#8eeaff';x.font='11px Arial';x.fillText('❄️',u.x-12,u.y-u.r-24)}
+if(u.burn>0){x.fillStyle='#ff6b3b';x.font='11px Arial';x.fillText('🔥',u.x+8,u.y-u.r-24)}
+if(u.stun>0){x.fillStyle='#ffe766';x.font='11px Arial';x.fillText('⚡',u.x,u.y-u.r-30)}
+if(u.fortify>0){x.strokeStyle='#9fdcff';x.lineWidth=2;x.beginPath();x.arc(u.x,u.y,24,0,7);x.stroke()}
+}function drawShots(){shots.forEach(s=>{let px=s.cx??s.x,py=s.cy??s.y;x.save();x.translate(px,py);
+if(s.type==='rock'){x.rotate((1-s.life/s.max)*8);x.fillStyle='#6f7880';x.strokeStyle='#c1c8ce';x.lineWidth=1.5;x.beginPath();x.moveTo(-7,-4);x.lineTo(-2,-8);x.lineTo(7,-5);x.lineTo(8,4);x.lineTo(1,8);x.lineTo(-7,5);x.closePath();x.fill();x.stroke()}
+else{x.shadowColor='#ff542b';x.shadowBlur=22;x.fillStyle='#ff5a2e';x.beginPath();x.arc(0,0,8,0,7);x.fill();x.fillStyle='#ffd75b';x.beginPath();x.arc(1,-1,4,0,7);x.fill();x.globalAlpha=.5;x.fillStyle='#ff6a2f';x.beginPath();x.ellipse(-10,0,10,4,0,0,7);x.fill();x.globalAlpha=1}x.restore()})}
+function draw(){x.clearRect(0,0,W,H);bg();tower('p',pT);tower('e',eT);drawDebris();[...units].sort((a,b)=>a.y-b.y).forEach(humanoid);drawShots();parts.forEach(p=>{x.globalAlpha=Math.max(0,p.life/.45);x.fillStyle=p.col;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill()});x.globalAlpha=1;let civLabel={titan:'🗿 TITAN',volcanis:'🌋 VOLCANIS',glacial:'❄️ GLACIAL',necromancer:'💀 NECROMANCER',tempest:'⚡ TEMPEST',verdantia:'🌿 VERDANTIA',umbral:'🌑 UMBRALIS',solaria:'☀️ SOLARIA',aqualis:'🌊 AQUALIS',dunara:'🏜️ DUNARA',mechanicha:'⚙️ MECHANICHA',dragonalis:'🐉 DRAGONALIS',crystalia:'💎 CRYSTALIA',mycelia:'🍄 MYCELIA',astralis:'🌌 ASTRALIS'};
+
+document.querySelector('#top .side .name').innerHTML=civLabel[playerCiv]+' TOWER — <span id="php">'+Math.ceil(pT)+'</span> HP';
+document.querySelector('#top .side.enemy .name').innerHTML=civLabel[enemyCiv()]+' TOWER — <span id="ehp">'+Math.ceil(eT)+'</span> HP';
+document.getElementById('ehp').textContent=Math.ceil(eT);document.getElementById('pbar').style.width=pT/14+'%';document.getElementById('ebar').style.width=eT/14+'%';document.getElementById('energyTxt').textContent='⚡ '+pE.toFixed(1)+' / 10';document.getElementById('efill').style.width=pE*10+'%';let m=Math.floor(time/60),s=Math.floor(time%60);document.getElementById('clock').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');document.getElementById('phase').textContent=count>0?'GET READY':time<=180?'⚡ OVERDRIVE':'⚔️ BATTLE';document.getElementById('mapBadge').textContent={titan:'🏔️ TITAN VALLEY',volcano:'🌋 VOLCANIC RIFT',frozen:'❄️ FROZEN PASS',forest:'🌿 ANCIENT FOREST',desert:'🏜️ DESERT RUINS',foundry:'⚙️ IRON FOUNDRY',sunken:'🌊 SUNKEN KINGDOM',astral:'🌌 ASTRAL RUINS'}[selectedMap]+' • '+battleMode.toUpperCase()+(debris.some(d=>d.landed)?' • 🧱 '+debris.filter(d=>d.landed).length+' BLOCKERS':'');[['pdef','p','def','🛡 DEF'],['pgen','p','gen','⚡ GEN'],['pcore','p','core','❤ CORE'],['edef','e','def','🛡 DEF'],['egen','e','gen','⚡ GEN'],['ecore','e','core','❤ CORE']].forEach(([id,side,key,label])=>{let el=document.getElementById(id),m=towerSys[side][key],pct=m.hp/m.max;el.textContent=label+' '+Math.ceil(m.hp);el.classList.toggle('down',m.hp<=0);el.classList.toggle('warn',m.hp>0&&pct<.35)});document.getElementById('mechanic').textContent={titan:'🛡️ FORTITUDE',volcanis:'🔥 BURN',glacial:'❄️ FREEZE',necromancer:'💀 REVIVE',tempest:'⚡ CHAIN',verdantia:'🌿 REGEN',umbral:'🌑 SHADOW',solaria:'☀️ RADIANCE',aqualis:'🌊 SLOW',dunara:'🏜️ MOBILITY',mechanicha:'⚙️ UPGRADE',dragonalis:'🐉 RAGE',crystalia:'💎 REFLECT',mycelia:'🍄 INFECT',astralis:'🌌 WARP'}[playerCiv];document.querySelectorAll('.unitBtn').forEach(b=>b.disabled=end||count>0||pE<playerDefs()[b.dataset.u].cost);
+let mb=document.getElementById('meteor'),sb=document.getElementById('shield'),ub=document.getElementById('ultimate');
+mb.disabled=end||count>0||meteorCD>0;sb.disabled=end||count>0||shieldCD>0;ub.disabled=end||ultimate<100;
+let pn=POWER[playerCiv];
+mb.textContent=meteorCD>0?pn[0]+' '+Math.ceil(meteorCD)+'s':pn[0];
+sb.textContent=shieldCD>0?pn[1]+' '+Math.ceil(shieldCD)+'s':shieldTime>0?pn[1]+' ACTIVE':pn[1];
+ub.textContent=pn[2]+' '+Math.floor(ultimate)+'%'}
+function loop(n){
+ if(!run)return;
+ let dt=Math.min(.033,(n-last)/1000||.016);last=n;
+ try{update(dt);draw();}
+ catch(err){
+   console.error('Tower Clash render error:',err);
+   // Keep the game loop alive instead of freezing the battlefield.
+ }
+ requestAnimationFrame(loop)
+}
+document.getElementById('langEN').addEventListener('click',()=>chooseLanguage('en'));
+document.getElementById('langFR').addEventListener('click',()=>chooseLanguage('fr'));
+document.getElementById('resultAgain').addEventListener('click',()=>{document.getElementById('result').classList.remove('show');go()});
+
+const mapSelect=document.getElementById('mapSelect'),modeSelect=document.getElementById('modeSelect'),adminToggle=document.getElementById('adminToggle'),adminPanel=document.getElementById('adminPanel'),adminStatus=document.getElementById('adminStatus');
+function adminMsg(t){adminStatus.textContent=t;banner('ADMIN: '+t,650)}
+mapSelect.addEventListener('change',()=>{selectedMap=mapSelect.value;document.getElementById('mapBadge').textContent=mapSelect.options[mapSelect.selectedIndex].text.toUpperCase()+' • '+battleMode.toUpperCase();draw()});
+modeSelect.addEventListener('change',()=>{battleMode=modeSelect.value;updateRankInfo();draw()});
+adminToggle.addEventListener('click',e=>{e.preventDefault();adminPanel.classList.toggle('show');adminToggle.textContent=adminPanel.classList.contains('show')?'👑 CLOSE ADMIN':'👑 ADMIN'});
+function adminBind(id,fn){document.getElementById(id).addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fn();draw()})}
+adminBind('admEnergy',()=>{adminEnergy=!adminEnergy;document.getElementById('admEnergy').textContent=adminEnergy?'∞ ENERGY ON':'∞ ENERGY';if(adminEnergy)pE=10;adminMsg(adminEnergy?'Infinite energy ON':'Infinite energy OFF')});
+adminBind('admUlt',()=>{ultimate=100;adminMsg('Ultimate set to 100%')});
+adminBind('admEnemy50',()=>{setTowerFraction('e',.5);adminMsg('Enemy tower systems set to 50%')});
+adminBind('admBreakDef',()=>{towerSys.e.def.hp=0;syncTowerTotals();adminMsg('Enemy defenses destroyed')});
+adminBind('admBreakGen',()=>{towerSys.e.gen.hp=0;syncTowerTotals();adminMsg('Enemy generator destroyed')});
+adminBind('admCore25',()=>{towerSys.e.core.hp=towerSys.e.core.max*.25;syncTowerTotals();adminMsg('Enemy core set to 25%')});
+adminBind('admSpawn',()=>{if(!run||end){adminMsg('Start a battle first');return}let defs=playerDefs(),k=Object.keys(defs).sort((a,b)=>(defs[b].cost||0)-(defs[a].cost||0))[0];spawn('p',k,1);adminMsg('Elite spawned: '+k)});
+adminBind('admReset',()=>{if(!run){adminMsg('Start a battle first');return}reset();adminMsg('Battle reset')});
+updateRankInfo();bindRoster();updatePowers();draw();setTimeout(translateUI,0);
+})();
+</script>
+</body>
+</html>
